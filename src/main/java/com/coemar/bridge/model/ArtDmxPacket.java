@@ -36,7 +36,7 @@ public class ArtDmxPacket implements LightingPacket{
                 '}';
     }
 
-    private String scrivoInDmxIByte(byte[] dmxData) {
+    public String scrivoInDmxIByte(byte[] dmxData) {
         if (dmxData == null) return "null";
 
         StringBuilder s = new StringBuilder();

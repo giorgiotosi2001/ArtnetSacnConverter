@@ -36,7 +36,7 @@ public class SacnParser extends PacketParser {
         return parseDataPacket(data, length);
     }
 
-    static SacnDataPacket parseDataPacket(byte[] data, int length) {
+    public static SacnDataPacket parseDataPacket(byte[] data, int length) {
         SacnDataPacket p = new SacnDataPacket();
 
         p.preambleSize = u16be(data, 0);
