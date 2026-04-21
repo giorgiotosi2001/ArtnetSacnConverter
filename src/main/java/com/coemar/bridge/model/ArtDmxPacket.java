@@ -32,19 +32,19 @@ public class ArtDmxPacket implements LightingPacket{
                 ", net=" + net +
                 ", portAddress=" + portAddress +
                 ", length=" + length +
-                ", dmxData=" + scrivoInEsadecimaleIByte(dmxData) +
+                ", dmxData=" + scrivoInDmxIByte(dmxData) +
                 '}';
     }
 
-    private String scrivoInEsadecimaleIByte(byte[] dmxData) {
+    private String scrivoInDmxIByte(byte[] dmxData) {
         if (dmxData == null) return "null";
 
-        StringBuilder sb = new StringBuilder(dmxData.length * 3);
+        StringBuilder s = new StringBuilder();
 
         for (byte b : dmxData) {
-            sb.append(String.format("%02X ", b));
+            s.append(b & 0xFF).append(" ");
         }
 
-        return sb.toString().trim();
+        return s.toString();
     }
 }

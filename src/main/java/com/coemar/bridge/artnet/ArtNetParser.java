@@ -2,11 +2,12 @@ package com.coemar.bridge.artnet;
 
 import com.coemar.bridge.model.ArtDmxPacket;
 import com.coemar.bridge.model.LightingPacket;
+import com.coemar.bridge.parser.PacketParser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class ArtNetParser {
+public class ArtNetParser extends PacketParser {
 
     private static final byte[] ARTNET_ID =
             "Art-Net\u0000".getBytes(StandardCharsets.US_ASCII);
@@ -49,20 +50,5 @@ public class ArtNetParser {
         return p;
     }
 
-    static int u8(byte[] data, int off) {
-        return data[off] & 0xFF;
-    }
-
-    static int u16be(byte[] data, int off) {
-        return ((data[off] & 0xFF) << 8) | (data[off + 1] & 0xFF);
-    }
-
-    static int u16le(byte[] data, int off) {
-        return (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
-    }
-
-    static void require(boolean condition, String message) {
-        if (!condition) throw new IllegalArgumentException(message);
-    }
 
 }
