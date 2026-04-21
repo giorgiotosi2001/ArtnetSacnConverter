@@ -27,7 +27,7 @@ public class SacnDataPacket implements LightingPacket{
         return "SacnDataPacket{" +
                 "preambleSize=" + preambleSize +
                 ", postambleSize=" + postambleSize +
-                ", cid=" + Arrays.toString(cid) +
+                ", cid=" + scrivoInEsadecimaleIByte(cid) +
                 ", rootVector=" + rootVector +
                 ", framingVector=" + framingVector +
                 ", sourceName='" + sourceName + '\'' +
@@ -56,6 +56,20 @@ public class SacnDataPacket implements LightingPacket{
         }
 
         return s.toString();
+    }
+
+    public String scrivoInEsadecimaleIByte(byte[] dmxData) {
+        if (dmxData == null) return "null";
+
+        StringBuilder s = new StringBuilder(dmxData.length * 3);
+
+        for (byte b : dmxData) {
+            int val = b & 0xFF;
+            if (val < 16) s.append('0');
+            s.append(Integer.toHexString(val).toUpperCase()).append(' ');
+        }
+
+        return s.toString().trim();
     }
 
 }
