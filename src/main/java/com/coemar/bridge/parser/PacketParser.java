@@ -1,12 +1,13 @@
 package com.coemar.bridge.parser;
 
 import com.coemar.bridge.artnet.ArtNetParser;
+import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.sacn.SacnParser;
 import com.coemar.bridge.model.LightingPacket;
 
 public class PacketParser {
 
-    static LightingPacket parse(byte[] data, int length) {
+    static Packet parse(byte[] data, int length) {
         if (ArtNetParser.looksLikeArtNet(data, length)) {
             return ArtNetParser.parse(data, length);
         }
@@ -30,6 +31,10 @@ public class PacketParser {
 
     public static int u32be( byte[] data, int off) {
         return ((data[off] & 0xFF) << 24) | ((data[off + 1] & 0xFF) << 16) | ((data[off + 2] & 0xFF) << 8) | (data[off + 3] & 0xFF);
+    }
+
+    public static int u32le( byte[] data, int off) {
+        return (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8) | ((data[off + 2] & 0xFF) << 16) | ((data[off + 3] & 0xFF) << 24);
     }
 
     public static void require(boolean condition, String message) {

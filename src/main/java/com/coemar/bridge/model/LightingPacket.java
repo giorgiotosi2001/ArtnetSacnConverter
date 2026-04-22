@@ -1,4 +1,4 @@
 package com.coemar.bridge.model;
 
-public interface LightingPacket {
+public interface LightingPacket extends Packet {
 }
