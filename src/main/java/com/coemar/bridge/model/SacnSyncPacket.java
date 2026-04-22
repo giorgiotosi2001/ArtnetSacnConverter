@@ -6,18 +6,12 @@ public class SacnSyncPacket implements Packet{
 
     public int rootFlagsAndLength;
     public int framingFlagsAndLength;
-    public int dmpFlagsAndLength;
-    //-------------------------------------
     public int rootPduLength;
     public int framingPduLength;
-    public int dmpPduLength;
-    //-------------------------------------
     public int preambleSize;
     public int postambleSize;
     public byte[] cid;                 // 16 byte
     public long rootVector;
-
-
     public long framingVector;
     public int sequenceNumber;
     public int synchronizationAddress;

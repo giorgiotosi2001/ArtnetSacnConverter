@@ -6,11 +6,9 @@ public class SacnDataPacket implements LightingPacket{
     public int rootFlagsAndLength;
     public int framingFlagsAndLength;
     public int dmpFlagsAndLength;
-    //-------------------------------------
     public int rootPduLength;
     public int framingPduLength;
     public int dmpPduLength;
-    //-------------------------------------
     public int preambleSize;
     public int postambleSize;
     public byte[] cid;                 // 16 byte

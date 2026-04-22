@@ -56,16 +56,52 @@ public class SacnParser extends PacketParser {
 }
 
 private static Packet parseDiscoveryPacket(byte[] data, int length) {
-    return null; // TODO
+    SacnDiscoveryPacket p = new SacnDiscoveryPacket();
+
+    p.preambleSize = u16be(data, 0);
+    p.postambleSize = u16be(data, 2);
+    p.rootFlagsAndLength = u16be(data, 16);
+    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    p.rootVector = u32be(data, 18);
+    p.cid = Arrays.copyOfRange(data, 22, 38);
+
+    p.framingFlagsAndLength = u16be(data, 38);
+    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+
+    p.framingVector = u32be(data, 40);
+    p.sourceName = readNullTerminatedUtf8(data, 44, 64);
+
+    p.discoveryFlagsAndLength = u16be(data, 112);
+    p.discoveryPduLength = p.discoveryFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+
+    p.discoveryVector = u32be(data, 114);
+    p.page = u8(data, 118);
+    p.lastPage = u8(data, 119);
+
+    int universesCount = (length - 120) / 2;
+    if(universesCount != (p.discoveryPduLength - 8) / 2) {
+        throw new IllegalArgumentException("Pacchetto sACN con lunghezza Discovery PDU non coerente con il numero di universi");
+    }
+    p.universes = new int[universesCount];
+    for (int i = 0; i < universesCount; i++) {
+        p.universes[i] = u16be(data, 120 + i * 2);
+    }
+
+    return p;
 }
 
 private static Packet parseSyncPacket(byte[] data, int length) {
     SacnSyncPacket p = new SacnSyncPacket();
 
+    p.rootVector = u32be(data, 18);
     p.preambleSize = u16be(data, 0);
     p.postambleSize = u16be(data, 2);
+    p.rootFlagsAndLength = u16be(data, 16);
+    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
     p.rootVector = u32be(data, 18);
     p.cid = Arrays.copyOfRange(data, 22, 38);
+    p.framingFlagsAndLength = u16be(data, 38);
+    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
     p.framingVector = u32be(data, 40);
     p.sequenceNumber = u8(data, 44);
     p.synchronizationAddress = u16be(data, 45);
@@ -79,9 +115,13 @@ public static SacnDataPacket parseDataPacket(byte[] data, int length) {
 
     p.preambleSize = u16be(data, 0);
     p.postambleSize = u16be(data, 2);
+    p.rootFlagsAndLength = u16be(data, 16);
+    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
     p.rootVector = u32be(data, 18);
     p.cid = Arrays.copyOfRange(data, 22, 38);
 
+    p.framingFlagsAndLength = u16be(data, 38);
+    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
     p.framingVector = u32be(data, 40);
     p.sourceName = readNullTerminatedUtf8(data, 44, 64);
     p.priority = u8(data, 108);
@@ -90,6 +130,8 @@ public static SacnDataPacket parseDataPacket(byte[] data, int length) {
     p.options = u8(data, 112);
     p.universe = u16be(data, 113);
 
+    p.dmpFlagsAndLength = u16be(data, 115);
+    p.dmpPduLength = p.dmpFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
     p.dmpVector = u8(data, 117);
     p.addressTypeAndDataType = u8(data, 118);
     p.firstPropertyAddress = u16be(data, 119);
