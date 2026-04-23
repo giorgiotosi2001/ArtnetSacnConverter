@@ -6,17 +6,75 @@ import java.util.Arrays;
 
 public class SacnSyncPacket implements Packet {
 
-    public int rootFlagsAndLength;
-    public int framingFlagsAndLength;
-    public int rootPduLength;
-    public int framingPduLength;
-    public int preambleSize;
-    public int postambleSize;
-    public byte[] cid;                 // 16 byte
-    public long rootVector;
-    public long framingVector;
-    public int sequenceNumber;
-    public int synchronizationAddress;
+    private final int rootFlagsAndLength;
+    private final int framingFlagsAndLength;
+    private final int rootPduLength;
+    private final int framingPduLength;
+    private final int preambleSize;
+    private final int postambleSize;
+    private final byte[] cid;                 // 16 byte
+    private final long rootVector;
+    private final long framingVector;
+    private final int sequenceNumber;
+    private final int synchronizationAddress;
+
+    public SacnSyncPacket(int rootFlagsAndLength, int framingFlagsAndLength, int rootPduLength, int framingPduLength, int preambleSize, int postambleSize, byte[] cid, long rootVector, long framingVector, int sequenceNumber, int synchronizationAddress) {
+        this.rootFlagsAndLength = rootFlagsAndLength;
+        this.framingFlagsAndLength = framingFlagsAndLength;
+        this.rootPduLength = rootPduLength;
+        this.framingPduLength = framingPduLength;
+        this.preambleSize = preambleSize;
+        this.postambleSize = postambleSize;
+        this.cid = cid;
+        this.rootVector = rootVector;
+        this.framingVector = framingVector;
+        this.sequenceNumber = sequenceNumber;
+        this.synchronizationAddress = synchronizationAddress;
+    }
+
+    public int getRootFlagsAndLength() {
+        return rootFlagsAndLength;
+    }
+
+    public int getFramingFlagsAndLength() {
+        return framingFlagsAndLength;
+    }
+
+    public int getRootPduLength() {
+        return rootPduLength;
+    }
+
+    public int getFramingPduLength() {
+        return framingPduLength;
+    }
+
+    public int getPreambleSize() {
+        return preambleSize;
+    }
+
+    public int getPostambleSize() {
+        return postambleSize;
+    }
+
+    public byte[] getCid() {
+        return cid;
+    }
+
+    public long getRootVector() {
+        return rootVector;
+    }
+
+    public long getFramingVector() {
+        return framingVector;
+    }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public int getSynchronizationAddress() {
+        return synchronizationAddress;
+    }
 
     @Override
     public String toString() {

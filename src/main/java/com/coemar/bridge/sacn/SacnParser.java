@@ -59,100 +59,96 @@ public class SacnParser extends PacketParser {
 }
 
 private static Packet parseDiscoveryPacket(byte[] data, int length) {
-    SacnDiscoveryPacket p = new SacnDiscoveryPacket();
 
-    p.preambleSize = u16be(data, 0);
-    p.postambleSize = u16be(data, 2);
-    p.rootFlagsAndLength = u16be(data, 16);
-    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.rootVector = u32be(data, 18);
-    p.cid = Arrays.copyOfRange(data, 22, 38);
+    int preambleSize = u16be(data, 0);
+    int postambleSize = u16be(data, 2);
+    int rootFlagsAndLength = u16be(data, 16);
+    int rootPduLength = rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    int rootVector = u32be(data, 18);
+    byte[] cid = Arrays.copyOfRange(data, 22, 38);
 
-    p.framingFlagsAndLength = u16be(data, 38);
-    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    int framingFlagsAndLength = u16be(data, 38);
+    int framingPduLength = framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
 
-    p.framingVector = u32be(data, 40);
-    p.sourceName = readNullTerminatedUtf8(data, 44, 64);
+    int framingVector = u32be(data, 40);
+    String sourceName = readNullTerminatedUtf8(data, 44, 64);
 
-    p.discoveryFlagsAndLength = u16be(data, 112);
-    p.discoveryPduLength = p.discoveryFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    int discoveryFlagsAndLength = u16be(data, 112);
+    int discoveryPduLength = discoveryFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
 
-    p.discoveryVector = u32be(data, 114);
-    p.page = u8(data, 118);
-    p.lastPage = u8(data, 119);
+    int discoveryVector = u32be(data, 114);
+    int page = u8(data, 118);
+    int lastPage = u8(data, 119);
 
     int universesCount = (length - 120) / 2;
-    if(universesCount != (p.discoveryPduLength - 8) / 2) {
+    if(universesCount != (discoveryPduLength - 8) / 2) {
         throw new IllegalArgumentException("Pacchetto sACN con lunghezza Discovery PDU non coerente con il numero di universi");
     }
-    p.universes = new int[universesCount];
+    int[] universes = new int[universesCount];
     for (int i = 0; i < universesCount; i++) {
-        p.universes[i] = u16be(data, 120 + i * 2);
+        universes[i] = u16be(data, 120 + i * 2);
     }
 
-    return p;
+    return new SacnDiscoveryPacket(rootFlagsAndLength, framingFlagsAndLength, discoveryFlagsAndLength, rootPduLength, framingPduLength, discoveryPduLength, preambleSize, postambleSize, cid, rootVector, framingVector, sourceName, discoveryVector, page, lastPage, universes);
 }
 
 private static Packet parseSyncPacket(byte[] data, int length) {
-    SacnSyncPacket p = new SacnSyncPacket();
-
-    p.rootVector = u32be(data, 18);
-    p.preambleSize = u16be(data, 0);
-    p.postambleSize = u16be(data, 2);
-    p.rootFlagsAndLength = u16be(data, 16);
-    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.rootVector = u32be(data, 18);
-    p.cid = Arrays.copyOfRange(data, 22, 38);
-    p.framingFlagsAndLength = u16be(data, 38);
-    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.framingVector = u32be(data, 40);
-    p.sequenceNumber = u8(data, 44);
-    p.synchronizationAddress = u16be(data, 45);
 
 
-    return p;
+    int preambleSize = u16be(data, 0);
+    int postambleSize = u16be(data, 2);
+    int rootFlagsAndLength = u16be(data, 16);
+    int rootPduLength = rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    long rootVector = u32be(data, 18);
+    byte[] cid = Arrays.copyOfRange(data, 22, 38);
+    int framingFlagsAndLength = u16be(data, 38);
+    int framingPduLength = framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    long framingVector = u32be(data, 40);
+    int sequenceNumber = u8(data, 44);
+    int synchronizationAddress = u16be(data, 45);
+
+    return new SacnSyncPacket(rootFlagsAndLength, framingFlagsAndLength, rootPduLength, framingPduLength, preambleSize, postambleSize, cid, rootVector, framingVector, sequenceNumber, synchronizationAddress);
 }
 
 public static SacnDataPacket parseDataPacket(byte[] data, int length) {
-    SacnDataPacket p = new SacnDataPacket();
 
-    p.preambleSize = u16be(data, 0);
-    p.postambleSize = u16be(data, 2);
-    p.rootFlagsAndLength = u16be(data, 16);
-    p.rootPduLength = p.rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.rootVector = u32be(data, 18);
-    p.cid = Arrays.copyOfRange(data, 22, 38);
+    int preambleSize = u16be(data, 0);
+    int postambleSize = u16be(data, 2);
+    int rootFlagsAndLength = u16be(data, 16);
+    int rootPduLength = rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    long rootVector = u32be(data, 18);
+    byte[] cid = Arrays.copyOfRange(data, 22, 38);
 
-    p.framingFlagsAndLength = u16be(data, 38);
-    p.framingPduLength = p.framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.framingVector = u32be(data, 40);
-    p.sourceName = readNullTerminatedUtf8(data, 44, 64);
-    p.priority = u8(data, 108);
-    p.synchronizationAddress = u16be(data, 109);
-    p.sequenceNumber = u8(data, 111);
-    p.options = u8(data, 112);
-    p.universe = u16be(data, 113);
+    int framingFlagsAndLength = u16be(data, 38);
+    int framingPduLength = framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    long framingVector = u32be(data, 40);
+    String sourceName = readNullTerminatedUtf8(data, 44, 64);
+    int priority = u8(data, 108);
+    int synchronizationAddress = u16be(data, 109);
+    int sequenceNumber = u8(data, 111);
+    int options = u8(data, 112);
+    int universe = u16be(data, 113);
 
-    p.dmpFlagsAndLength = u16be(data, 115);
-    p.dmpPduLength = p.dmpFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    p.dmpVector = u8(data, 117);
-    p.addressTypeAndDataType = u8(data, 118);
-    p.firstPropertyAddress = u16be(data, 119);
-    p.addressIncrement = u16be(data, 121);
-    p.propertyValueCount = u16be(data, 123);
+    int dmpFlagsAndLength = u16be(data, 115);
+    int dmpPduLength = dmpFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
+    int dmpVector = u8(data, 117);
+    int addressTypeAndDataType = u8(data, 118);
+    int firstPropertyAddress = u16be(data, 119);
+    int addressIncrement = u16be(data, 121);
+    int propertyValueCount = u16be(data, 123);
 
-    require(p.universe >= 1 && p.universe <= 63999, "Universe sACN fuori range");
-    require(p.firstPropertyAddress == 0x0000, "First Property Address non valido");
-    require(p.addressIncrement == 0x0001, "Address Increment non valido");
-    require(p.propertyValueCount >= 1 && p.propertyValueCount <= 513, "Property Value Count non valido");
+    require(universe >= 1 && universe <= 63999, "Universe sACN fuori range");
+    require(firstPropertyAddress == 0x0000, "First Property Address non valido");
+    require(addressIncrement == 0x0001, "Address Increment non valido");
+    require(propertyValueCount >= 1 && propertyValueCount <= 513, "Property Value Count non valido");
 
     int valuesOffset = 125;
-    require(length >= valuesOffset + p.propertyValueCount, "Payload DMP incompleto");
+    require(length >= valuesOffset + propertyValueCount, "Payload DMP incompleto");
 
-    p.startCode = u8(data, valuesOffset);
-    p.dmxData = Arrays.copyOfRange(data, valuesOffset + 1, valuesOffset + p.propertyValueCount);
+    int startCode = u8(data, valuesOffset);
+    byte[] dmxData = Arrays.copyOfRange(data, valuesOffset + 1, valuesOffset + propertyValueCount);
 
-    return p;
+    return new SacnDataPacket(rootFlagsAndLength, framingFlagsAndLength, dmpFlagsAndLength, rootPduLength, framingPduLength, dmpPduLength, preambleSize, postambleSize, cid, rootVector, framingVector, sourceName, priority, synchronizationAddress, sequenceNumber, options, universe, dmpVector, addressTypeAndDataType, firstPropertyAddress, addressIncrement, propertyValueCount, startCode, dmxData);
 }
 
 static String readNullTerminatedUtf8(byte[] data, int offset, int maxLen) {

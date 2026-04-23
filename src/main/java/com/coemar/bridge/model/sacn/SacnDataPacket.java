@@ -3,30 +3,153 @@ package com.coemar.bridge.model.sacn;
 import com.coemar.bridge.model.LightingPacket;
 
 public class SacnDataPacket implements LightingPacket {
-    public int rootFlagsAndLength;
-    public int framingFlagsAndLength;
-    public int dmpFlagsAndLength;
-    public int rootPduLength;
-    public int framingPduLength;
-    public int dmpPduLength;
-    public int preambleSize;
-    public int postambleSize;
-    public byte[] cid;                 // 16 byte
-    public long rootVector;
-    public long framingVector;
-    public String sourceName;
-    public int priority;
-    public int synchronizationAddress;
-    public int sequenceNumber;
-    public int options;
-    public int universe;
-    public int dmpVector;
-    public int addressTypeAndDataType;
-    public int firstPropertyAddress;
-    public int addressIncrement;
-    public int propertyValueCount;
-    public int startCode;
-    public byte[] dmxData;
+    private final int rootFlagsAndLength;
+    private final int framingFlagsAndLength;
+    private final int dmpFlagsAndLength;
+    private final int rootPduLength;
+    private final int framingPduLength;
+    private final int dmpPduLength;
+    private final int preambleSize;
+    private final int postambleSize;
+    private final byte[] cid;                 // 16 byte
+    private final long rootVector;
+    private final long framingVector;
+    private final String sourceName;
+    private final int priority;
+    private final int synchronizationAddress;
+    private final int sequenceNumber;
+    private final int options;
+    private final int universe;
+    private final int dmpVector;
+    private final int addressTypeAndDataType;
+    private final int firstPropertyAddress;
+    private final int addressIncrement;
+    private final int propertyValueCount;
+    private final int startCode;
+    private final byte[] dmxData;
+
+    public SacnDataPacket(int rootFlagsAndLength, int framingFlagsAndLength, int dmpFlagsAndLength, int rootPduLength, int framingPduLength, int dmpPduLength, int preambleSize, int postambleSize, byte[] cid, long rootVector, long framingVector, String sourceName, int priority, int synchronizationAddress, int sequenceNumber, int options, int universe, int dmpVector, int addressTypeAndDataType, int firstPropertyAddress, int addressIncrement, int propertyValueCount, int startCode, byte[] dmxData) {
+        this.rootFlagsAndLength = rootFlagsAndLength;
+        this.framingFlagsAndLength = framingFlagsAndLength;
+        this.dmpFlagsAndLength = dmpFlagsAndLength;
+        this.rootPduLength = rootPduLength;
+        this.framingPduLength = framingPduLength;
+        this.dmpPduLength = dmpPduLength;
+        this.preambleSize = preambleSize;
+        this.postambleSize = postambleSize;
+        this.cid = cid;
+        this.rootVector = rootVector;
+        this.framingVector = framingVector;
+        this.sourceName = sourceName;
+        this.priority = priority;
+        this.synchronizationAddress = synchronizationAddress;
+        this.sequenceNumber = sequenceNumber;
+        this.options = options;
+        this.universe = universe;
+        this.dmpVector = dmpVector;
+        this.addressTypeAndDataType = addressTypeAndDataType;
+        this.firstPropertyAddress = firstPropertyAddress;
+        this.addressIncrement = addressIncrement;
+        this.propertyValueCount = propertyValueCount;
+        this.startCode = startCode;
+        this.dmxData = dmxData;
+    }
+
+    public int getRootFlagsAndLength() {
+        return rootFlagsAndLength;
+    }
+
+    public int getFramingFlagsAndLength() {
+        return framingFlagsAndLength;
+    }
+
+    public int getDmpFlagsAndLength() {
+        return dmpFlagsAndLength;
+    }
+
+    public int getRootPduLength() {
+        return rootPduLength;
+    }
+
+    public int getFramingPduLength() {
+        return framingPduLength;
+    }
+
+    public int getDmpPduLength() {
+        return dmpPduLength;
+    }
+
+    public int getPreambleSize() {
+        return preambleSize;
+    }
+
+    public int getPostambleSize() {
+        return postambleSize;
+    }
+
+    public byte[] getCid() {
+        return cid;
+    }
+
+    public long getRootVector() {
+        return rootVector;
+    }
+
+    public long getFramingVector() {
+        return framingVector;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public int getSynchronizationAddress() {
+        return synchronizationAddress;
+    }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    public int getOptions() {
+        return options;
+    }
+
+    public int getUniverse() {
+        return universe;
+    }
+
+    public int getDmpVector() {
+        return dmpVector;
+    }
+
+    public int getAddressTypeAndDataType() {
+        return addressTypeAndDataType;
+    }
+
+    public int getFirstPropertyAddress() {
+        return firstPropertyAddress;
+    }
+
+    public int getAddressIncrement() {
+        return addressIncrement;
+    }
+
+    public int getPropertyValueCount() {
+        return propertyValueCount;
+    }
+
+    public int getStartCode() {
+        return startCode;
+    }
+
+    public byte[] getDmxData() {
+        return dmxData;
+    }
 
     @Override
     public String toString() {
