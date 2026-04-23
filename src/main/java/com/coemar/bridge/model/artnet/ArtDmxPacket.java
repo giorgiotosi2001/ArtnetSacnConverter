@@ -4,22 +4,70 @@ import com.coemar.bridge.model.LightingPacket;
 
 public class ArtDmxPacket implements LightingPacket {
 
-    public int opCode;
+    private final int opCode;
 
-    public int protocolVersion;
+    private final int protocolVersion;
 
-    public int sequence;
+    private final int sequence;
 
-    public int physical;
+    private final int physical;
 
-    public int subUni;
+    private final int subUni;
 
-    public int net;
+    private final int net;
 
-    public int portAddress; // net + subuni(subnet(4bit alti) + universe(4 bit bassi))
-    public int length;
+    private final int portAddress; // net + subuni(subnet(4bit alti) + universe(4 bit bassi))
+    private final int length;
 
-    public byte[] dmxData;
+    private final byte[] dmxData;
+
+    public int getOpCode() {
+        return opCode;
+    }
+
+    public int getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public int getPhysical() {
+        return physical;
+    }
+
+    public int getSubUni() {
+        return subUni;
+    }
+
+    public int getNet() {
+        return net;
+    }
+
+    public int getPortAddress() {
+        return portAddress;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public byte[] getDmxData() {
+        return dmxData;
+    }
+
+    public ArtDmxPacket(int opCode, int protocolVersion, int sequence, int physical, int subUni, int net, int portAddress, int length, byte[] dmxData) {
+        this.opCode = opCode;
+        this.protocolVersion = protocolVersion;
+        this.sequence = sequence;
+        this.physical = physical;
+        this.subUni = subUni;
+        this.net = net;
+        this.portAddress = portAddress;
+        this.length = length;
+        this.dmxData = dmxData;
+    }
 
     @Override
     public String toString() {
