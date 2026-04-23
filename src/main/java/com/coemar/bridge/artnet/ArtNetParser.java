@@ -3,10 +3,15 @@ package com.coemar.bridge.artnet;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.ArtDmxPacket;
 import com.coemar.bridge.model.LightingPacket;
+import com.coemar.bridge.model.artnet.ArtPollFlags;
+import com.coemar.bridge.model.artnet.ArtPollPacket;
 import com.coemar.bridge.parser.PacketParser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Objects;
+
+import static com.coemar.bridge.artnet.ArtNetOpCode.*;
 
 public class ArtNetParser extends PacketParser {
 
@@ -20,16 +25,42 @@ public class ArtNetParser extends PacketParser {
 
     public static Packet parse(byte[] data, int length) {
 
-        require(length >= 18, "Pacchetto Art-Net troppo corto");
+        require(length >= 10, "Pacchetto Art-Net troppo corto");
 
-        int opCode = u16le(data, 8);
+        ArtNetOpCode opCode = ArtNetOpCode.fromValue(u16le(data, 8));
 
-        if (opCode == 0x5000) {
-            return parseArtDmx(data, length);
+        switch (Objects.requireNonNull(opCode)) {
+
+            case OpOutput:
+                parseArtDmx(data, length);
+                break;
+
+            case OpPoll:
+                parseArtPollPacket(data, length);
+                break;
+            case OpPollReply:
+            case OpDiagData:
+                break;
+
+            default:
+                break;
         }
 
-        throw new IllegalArgumentException("OpCode Art-Net non supportato: 0x" + Integer.toHexString(opCode));
+        throw new IllegalArgumentException("OpCode Art-Net non supportato: 0x" + Integer.toHexString(opCode.getValue()));
 
+    }
+
+    private static ArtPollPacket parseArtPollPacket(byte[] data, int length) {
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        ArtPollFlags flags = new ArtPollFlags(((byte) u8(data, 12)));
+        int diagPriority = u8(data, 13);
+        int targetPortAddressTop = u16be(data, 14);
+        int targetPortAddressBottom = u16be(data, 16);
+        int estaManufacturerCode = u16be(data, 18);
+        int oemCode = u16be(data, 20);
+
+        return new ArtPollPacket(opCode, protocolVersion, flags, diagPriority, targetPortAddressTop, targetPortAddressBottom, estaManufacturerCode, oemCode);
     }
 
     public static ArtDmxPacket parseArtDmx(byte[] data, int lengthData) {
