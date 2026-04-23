@@ -75,7 +75,7 @@ public class SacnDiscoveryPacket implements Packet {
     }
 
     public byte[] getCid() {
-        return cid;
+        return Arrays.copyOf(cid, cid.length);
     }
 
     public long getRootVector() {
@@ -103,7 +103,7 @@ public class SacnDiscoveryPacket implements Packet {
     }
 
     public int[] getUniverses() {
-        return universes;
+        return Arrays.copyOf(universes, universes.length);
     }
 
     @Override

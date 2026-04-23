@@ -2,6 +2,8 @@ package com.coemar.bridge.model.sacn;
 
 import com.coemar.bridge.model.LightingPacket;
 
+import java.util.Arrays;
+
 public class SacnDataPacket implements LightingPacket {
     private final int rootFlagsAndLength;
     private final int framingFlagsAndLength;
@@ -88,7 +90,7 @@ public class SacnDataPacket implements LightingPacket {
     }
 
     public byte[] getCid() {
-        return cid;
+        return Arrays.copyOf(cid, cid.length);
     }
 
     public long getRootVector() {
@@ -148,7 +150,7 @@ public class SacnDataPacket implements LightingPacket {
     }
 
     public byte[] getDmxData() {
-        return dmxData;
+        return Arrays.copyOf(dmxData, dmxData.length);
     }
 
     @Override

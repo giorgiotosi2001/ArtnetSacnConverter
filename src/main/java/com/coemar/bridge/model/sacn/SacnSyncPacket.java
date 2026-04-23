@@ -57,7 +57,7 @@ public class SacnSyncPacket implements Packet {
     }
 
     public byte[] getCid() {
-        return cid;
+        return Arrays.copyOf(cid, cid.length);
     }
 
     public long getRootVector() {

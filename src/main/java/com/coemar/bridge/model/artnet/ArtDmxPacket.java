@@ -2,6 +2,8 @@ package com.coemar.bridge.model.artnet;
 
 import com.coemar.bridge.model.LightingPacket;
 
+import java.util.Arrays;
+
 public class ArtDmxPacket implements LightingPacket {
 
     private final int opCode;
@@ -54,7 +56,7 @@ public class ArtDmxPacket implements LightingPacket {
     }
 
     public byte[] getDmxData() {
-        return dmxData;
+        return Arrays.copyOf(dmxData, dmxData.length);
     }
 
     public ArtDmxPacket(int opCode, int protocolVersion, int sequence, int physical, int subUni, int net, int portAddress, int length, byte[] dmxData) {
