@@ -1,8 +1,8 @@
-package com.coemar.bridge.model;
+package com.coemar.bridge.model.sacn;
 
-import java.util.Arrays;
+import com.coemar.bridge.model.LightingPacket;
 
-public class SacnDataPacket implements LightingPacket{
+public class SacnDataPacket implements LightingPacket {
     public int rootFlagsAndLength;
     public int framingFlagsAndLength;
     public int dmpFlagsAndLength;

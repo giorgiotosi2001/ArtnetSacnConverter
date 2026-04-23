@@ -1,8 +1,8 @@
-package com.coemar.bridge.model;
+package com.coemar.bridge.model.artnet;
 
-import java.util.Arrays;
+import com.coemar.bridge.model.LightingPacket;
 
-public class ArtDmxPacket implements LightingPacket{
+public class ArtDmxPacket implements LightingPacket {
 
     public int opCode;
 

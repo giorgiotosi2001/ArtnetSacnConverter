@@ -1,8 +1,10 @@
-package com.coemar.bridge.model;
+package com.coemar.bridge.model.sacn;
+
+import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
-public class SacnDiscoveryPacket implements Packet{
+public class SacnDiscoveryPacket implements Packet {
 
     public int rootFlagsAndLength;
     public int framingFlagsAndLength;

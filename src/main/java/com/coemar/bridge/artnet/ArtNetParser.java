@@ -1,6 +1,6 @@
 package com.coemar.bridge.artnet;
 
-import com.coemar.bridge.model.ArtDmxPacket;
+import com.coemar.bridge.model.artnet.ArtDmxPacket;
 import com.coemar.bridge.model.LightingPacket;
 import com.coemar.bridge.parser.PacketParser;
 

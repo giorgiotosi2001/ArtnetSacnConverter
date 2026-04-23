@@ -1,8 +1,8 @@
 package com.coemar.bridge.network;
 
 import com.coemar.bridge.artnet.ArtNetParser;
-import com.coemar.bridge.model.ArtDmxPacket;
-import com.coemar.bridge.model.SacnDataPacket;
+import com.coemar.bridge.model.artnet.ArtDmxPacket;
+import com.coemar.bridge.model.sacn.SacnDataPacket;
 import com.coemar.bridge.sacn.SacnParser;
 
 import java.net.DatagramPacket;

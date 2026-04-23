@@ -1,6 +1,9 @@
 package com.coemar.bridge.sacn;
 
 import com.coemar.bridge.model.*;
+import com.coemar.bridge.model.sacn.SacnDataPacket;
+import com.coemar.bridge.model.sacn.SacnDiscoveryPacket;
+import com.coemar.bridge.model.sacn.SacnSyncPacket;
 import com.coemar.bridge.parser.PacketParser;
 
 import java.nio.charset.StandardCharsets;
