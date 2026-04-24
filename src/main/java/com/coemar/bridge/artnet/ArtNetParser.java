@@ -7,8 +7,13 @@ import com.coemar.bridge.model.artnet.packets.incoming.ArtCommandPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDataRequestPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDiagDataPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtInputPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtNzsPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtSyncPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtTimeCodePacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtTriggerPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtVlcPacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtPollPacket;
 
@@ -38,6 +43,8 @@ public class ArtNetParser {
 
             case OpOutput:
                 return parseArtDmx(data, length);
+            case OpNzs:
+                return parseArtNzs(data, length);
             case OpPoll:
                 return parseArtPollPacket(data, length);
             case OpAddress:
@@ -48,10 +55,16 @@ public class ArtNetParser {
                 return parseArtDataRequestPacket(data, length);
             case OpDiagData:
                 return parseArtDiagDataPacket(data, length);
+            case OpInput:
+                return parseArtInputPacket(data, length);
             case OpIpProg:
                 return parseArtIpProgPacket(data, length);
+            case OpSync:
+                return parseArtSyncPacket(data, length);
             case OpTimeCode:
                 return parseArtTimeCodePacket(data, length);
+            case OpTrigger:
+                return parseArtTriggerPacket(data, length);
             default:
                 break;
         }
@@ -173,6 +186,28 @@ public class ArtNetParser {
         );
     }
 
+    private static ArtInputPacket parseArtInputPacket(byte[] data, int length) {
+        require(length >= 20, "Pacchetto ArtInput troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int bindIndex = u8(data, 13);
+        int numPorts = u16be(data, 14);
+        byte[] input = Arrays.copyOfRange(data, 16, 20);
+
+        require(numPorts >= 0 && numPorts <= 4, "NumPorts ArtInput fuori range");
+
+        return new ArtInputPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                bindIndex,
+                numPorts,
+                input
+        );
+    }
+
     private static ArtTimeCodePacket parseArtTimeCodePacket(byte[] data, int length) {
         require(length >= 19, "Pacchetto ArtTimeCode troppo corto");
 
@@ -199,7 +234,48 @@ public class ArtNetParser {
         );
     }
 
+    private static ArtSyncPacket parseArtSyncPacket(byte[] data, int length) {
+        require(length >= 14, "Pacchetto ArtSync troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int aux1 = u8(data, 12);
+        int aux2 = u8(data, 13);
+
+        return new ArtSyncPacket(
+                opCode,
+                protocolVersion,
+                aux1,
+                aux2
+        );
+    }
+
+    private static ArtTriggerPacket parseArtTriggerPacket(byte[] data, int length) {
+        require(length >= 523, "Pacchetto ArtTrigger troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int filler2 = u8(data, 13);
+        int oemCode = u16be(data, 14);
+        int key = u8(data, 16);
+        int subKey = u8(data, 17);
+        byte[] triggerData = Arrays.copyOfRange(data, 18, 530);
+
+        return new ArtTriggerPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                filler2,
+                oemCode,
+                key,
+                subKey,
+                triggerData
+        );
+    }
+
     public static ArtDmxPacket parseArtDmx(byte[] data, int lengthData) {
+        require(lengthData >= 18, "Header ArtDmx incompleto");
 
         int opCode = u16le(data, 8);
         int protocolVersion = u16be(data, 10);
@@ -211,11 +287,90 @@ public class ArtNetParser {
         int length = u16be(data, 16);
 
         require(length >= 2 && length <= 512, "Length ArtDmx fuori range");
+        require((length & 1) == 0, "Length ArtDmx deve essere pari");
         require(lengthData >= 18 + length, "Payload ArtDmx incompleto");
 
         byte[] dmxData = Arrays.copyOfRange(data, 18, 18 + length);
 
         return new ArtDmxPacket(opCode, protocolVersion, sequence, physical, subUni, net, portAddress, length, dmxData);
+    }
+
+    private static ArtNzsPacket parseArtNzs(byte[] data, int lengthData) {
+        require(lengthData >= 18, "Header ArtNzs incompleto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int sequence = u8(data, 12);
+        int startCode = u8(data, 13);
+        int subUni = u8(data, 14);
+        int net = u8(data, 15);
+        int portAddress = ((net & 0x7F) << 8) | subUni;
+        int length = u16be(data, 16);
+
+        require(length >= 1 && length <= 512, "Length ArtNzs fuori range");
+        require(startCode != 0x00, "StartCode ArtNzs non puo essere zero");
+        require(startCode != 0xCC, "StartCode ArtNzs non puo essere RDM");
+        require(lengthData >= 18 + length, "Payload ArtNzs incompleto");
+
+        byte[] nzsData = Arrays.copyOfRange(data, 18, 18 + length);
+
+        if (looksLikeArtVlc(startCode, nzsData)) {
+            return parseArtVlcPacket(opCode, protocolVersion, sequence, startCode, subUni, net, portAddress, length, nzsData);
+        }
+
+        return new ArtNzsPacket(opCode, protocolVersion, sequence, startCode, subUni, net, portAddress, length, nzsData);
+    }
+
+    private static boolean looksLikeArtVlc(int startCode, byte[] nzsData) {
+        return startCode == 0x09
+                && nzsData.length >= 22
+                && u8(nzsData, 0) == 0x41
+                && u8(nzsData, 1) == 0x4C
+                && u8(nzsData, 2) == 0x45;
+    }
+
+    private static ArtVlcPacket parseArtVlcPacket(int opCode, int protocolVersion, int sequence, int startCode,
+                                                  int subUni, int net, int portAddress, int length, byte[] nzsData) {
+        int flags = u8(nzsData, 3);
+        int transactionNumber = u16be(nzsData, 4);
+        int slotAddress = u16be(nzsData, 6);
+        int payloadCount = u16be(nzsData, 8);
+        int payloadChecksum = u16be(nzsData, 10);
+        int spare1 = u8(nzsData, 12);
+        int vlcDepth = u8(nzsData, 13);
+        int vlcFrequency = u16be(nzsData, 14);
+        int vlcModulationType = u16be(nzsData, 16);
+        int payloadLanguage = u16be(nzsData, 18);
+        int beaconRepeatFrequency = u16be(nzsData, 20);
+
+        require(payloadCount >= 0 && payloadCount <= 480, "PayloadCount ArtVlc fuori range");
+        require(length == 22 + payloadCount, "Length ArtVlc non coerente con PayloadCount");
+
+        byte[] payload = Arrays.copyOfRange(nzsData, 22, 22 + payloadCount);
+
+        return new ArtVlcPacket(
+                opCode,
+                protocolVersion,
+                sequence,
+                startCode,
+                subUni,
+                net,
+                portAddress,
+                length,
+                nzsData,
+                flags,
+                transactionNumber,
+                slotAddress,
+                payloadCount,
+                payloadChecksum,
+                spare1,
+                vlcDepth,
+                vlcFrequency,
+                vlcModulationType,
+                payloadLanguage,
+                beaconRepeatFrequency,
+                payload
+        );
     }
 
     private static ArtIpProgPacket parseArtIpProgPacket(byte[] data, int length) {

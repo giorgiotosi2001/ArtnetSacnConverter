@@ -60,6 +60,13 @@ public class ArtDmxPacket implements LightingPacket {
     }
 
     public ArtDmxPacket(int opCode, int protocolVersion, int sequence, int physical, int subUni, int net, int portAddress, int length, byte[] dmxData) {
+        if (dmxData == null) {
+            throw new IllegalArgumentException("dmxData non puo essere null");
+        }
+        if (length != dmxData.length) {
+            throw new IllegalArgumentException("length e dmxData.length non coincidono");
+        }
+
         this.opCode = opCode;
         this.protocolVersion = protocolVersion;
         this.sequence = sequence;
@@ -68,7 +75,7 @@ public class ArtDmxPacket implements LightingPacket {
         this.net = net;
         this.portAddress = portAddress;
         this.length = length;
-        this.dmxData = dmxData;
+        this.dmxData = Arrays.copyOf(dmxData, dmxData.length);
     }
 
     @Override
