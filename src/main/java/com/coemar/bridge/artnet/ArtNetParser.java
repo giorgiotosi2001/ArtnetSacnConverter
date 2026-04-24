@@ -31,16 +31,12 @@ public class ArtNetParser {
         switch (Objects.requireNonNull(opCode)) {
 
             case OpOutput:
-                parseArtDmx(data, length);
-                break;
-
+                return parseArtDmx(data, length);
             case OpPoll:
-                parseArtPollPacket(data, length);
-                break;
+                return parseArtPollPacket(data, length);
             case OpPollReply:
             case OpDiagData:
                 break;
-
             default:
                 break;
         }
