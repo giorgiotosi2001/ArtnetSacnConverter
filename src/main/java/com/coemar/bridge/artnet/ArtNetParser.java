@@ -3,6 +3,7 @@ package com.coemar.bridge.artnet;
 import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtPollPacket;
 
@@ -34,6 +35,8 @@ public class ArtNetParser {
                 return parseArtDmx(data, length);
             case OpPoll:
                 return parseArtPollPacket(data, length);
+            case OpIpProg:
+                return parseArtIpProgPacket(data, length);
             case OpPollReply:
             case OpDiagData:
                 break;
@@ -75,6 +78,36 @@ public class ArtNetParser {
         byte[]dmxData = Arrays.copyOfRange(data, 18, 18 + length);
 
         return new ArtDmxPacket( opCode,  protocolVersion,  sequence,  physical,  subUni,  net,  portAddress,  length,  dmxData);
+    }
+
+    private static ArtIpProgPacket parseArtIpProgPacket(byte[] data, int length) {
+        require(length >= 34, "Pacchetto ArtIpProg troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int filler2 = u8(data, 13);
+        int command = u8(data, 14);
+        int filler4 = u8(data, 15);
+        byte[] progIpAddress = Arrays.copyOfRange(data, 16, 20);
+        byte[] progSubnetMask = Arrays.copyOfRange(data, 20, 24);
+        int progPort = u16be(data, 24);
+        byte[] progDefaultGateway = Arrays.copyOfRange(data, 26, 30);
+        byte[] spare = Arrays.copyOfRange(data, 30, 34);
+
+        return new ArtIpProgPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                filler2,
+                command,
+                filler4,
+                progIpAddress,
+                progSubnetMask,
+                progPort,
+                progDefaultGateway,
+                spare
+        );
     }
 
 
