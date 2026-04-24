@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Richiesta della Table of Devices (TOD) RDM di uno o piu output gateway.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; gateway in unicast o broadcast; input gateway puo usare directed broadcast.</li>
+ *   <li><b>Risposta attesa:</b> {@code ArtTodDataPacket}.</li>
+ *   <li><b>Serve per:</b> ottenere gli UID RDM scoperti su specifici Port-Address.</li>
+ *   <li><b>Note:</b> non forza una full discovery; chiede il TOD gia mantenuto dal gateway.</li>
+ * </ul>
+ */
 public class ArtTodRequestPacket implements Packet {
 
     private static final int SPARE_LENGTH = 7;

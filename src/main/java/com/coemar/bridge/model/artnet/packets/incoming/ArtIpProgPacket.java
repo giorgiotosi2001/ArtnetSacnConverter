@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Comando di programmazione remota dei parametri IP del nodo.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; nodo specifico, in unicast.</li>
+ *   <li><b>Risposta attesa:</b> {@code ArtIpProgReplyPacket}.</li>
+ *   <li><b>Serve per:</b> impostare IP, subnet mask, gateway, porta e modalita DHCP/default.</li>
+ *   <li><b>Non fa:</b> non e ammesso in broadcast e non trasporta dati DMX.</li>
+ * </ul>
+ */
 public class ArtIpProgPacket implements Packet {
 
     private static final int IPV4_LENGTH = 4;

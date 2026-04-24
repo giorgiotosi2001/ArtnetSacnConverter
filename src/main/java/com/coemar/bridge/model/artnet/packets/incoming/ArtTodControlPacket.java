@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Comando di controllo discovery/TOD per una porta RDM di output gateway.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; output gateway in unicast o broadcast; input gateway puo usare directed broadcast.</li>
+ *   <li><b>Risposta attesa:</b> {@code ArtTodDataPacket}.</li>
+ *   <li><b>Serve per:</b> flush TOD, fine discovery corrente, enable/disable incremental discovery.</li>
+ *   <li><b>Note:</b> agisce su un Port-Address preciso identificato da Net + Address.</li>
+ * </ul>
+ */
 public class ArtTodControlPacket implements Packet {
 
     private static final int SPARE_LENGTH = 7;

@@ -3,6 +3,15 @@ package com.coemar.bridge.model.artnet.packets.incoming;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
 
+/**
+ * <p>Richiesta di discovery e interrogazione capability dei nodi Art-Net.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; nodi/media server, in unicast o broadcast.</li>
+ *   <li><b>Risposta attesa:</b> {@code ArtPollReplyPacket}.</li>
+ *   <li><b>Serve per:</b> rilevare dispositivi, porte, stato, supporto diagnostica e modalita target.</li>
+ *   <li><b>Non fa:</b> non trasporta DMX e non applica configurazioni al nodo.</li>
+ * </ul>
+ */
 public class ArtPollPacket implements Packet{
 
     private final int opCode;

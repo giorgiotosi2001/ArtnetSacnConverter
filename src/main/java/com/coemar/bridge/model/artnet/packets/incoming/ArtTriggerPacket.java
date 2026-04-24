@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Pacchetto trigger per macro, soft-key, show o funzioni vendor-specific.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; dispositivi Art-Net, in broadcast o unicast.</li>
+ *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
+ *   <li><b>Serve per:</b> invocare azioni rapide definite da OEM, key e subKey.</li>
+ *   <li><b>Note:</b> il significato del payload dipende da OEM e tipo di trigger.</li>
+ * </ul>
+ */
 public class ArtTriggerPacket implements Packet {
 
     private static final int DATA_LENGTH = 512;

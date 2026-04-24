@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Trasporto Art-Net di messaggi RDM non di discovery.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> bidirezionale tra controller, gateway e nodi proxy, in unicast.</li>
+ *   <li><b>Risposta attesa:</b> nessuna risposta Art-Net dedicata; l'eventuale risposta RDM torna come un altro {@code ArtRdmPacket}.</li>
+ *   <li><b>Serve per:</b> inoltrare il pacchetto RDM raw verso il Port-Address corretto, con informazioni sulla coda FIFO gateway.</li>
+ *   <li><b>Note:</b> il payload RDM esclude il DMX start code {@code 0xCC}.</li>
+ * </ul>
+ */
 public class ArtRdmPacket implements Packet {
 
     private static final int SPARE_LENGTH = 5;

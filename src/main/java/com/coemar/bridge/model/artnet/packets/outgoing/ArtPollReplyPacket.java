@@ -9,6 +9,15 @@ import java.util.Locale;
 
 import static com.coemar.bridge.util.BinarySerializeUtils.*;
 
+/**
+ * <p>Risposta di discovery che descrive identita, porte, stato e capability del nodo.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> nodo/media server -&gt; controller che ha effettuato il poll.</li>
+ *   <li><b>Risponde a:</b> {@code ArtPollPacket}.</li>
+ *   <li><b>Serve per:</b> annunciare IP, nomi, report, porte, protocollo, supporto RDM/sACN e stato operativo.</li>
+ *   <li><b>Non fa:</b> non trasporta livelli DMX; serve solo a discovery e stato del nodo.</li>
+ * </ul>
+ */
 public class ArtPollReplyPacket {
     private static final int IPV4_LENGTH = 4;
     private static final int MAC_LENGTH = 6;

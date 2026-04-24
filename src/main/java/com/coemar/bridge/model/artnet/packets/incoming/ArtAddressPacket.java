@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Comando di configurazione remota di un nodo Art-Net.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; nodo, normalmente in unicast.</li>
+ *   <li><b>Risposta attesa:</b> nessuna risposta dedicata; l'esito si verifica con un successivo {@code ArtPollPacket}/{@code ArtPollReplyPacket}.</li>
+ *   <li><b>Serve per:</b> nomi porta, Net/Sub-Net/Universe, direzione, merge mode e altre opzioni porta.</li>
+ *   <li><b>Non fa:</b> non trasporta livelli DMX e non e una query di stato.</li>
+ * </ul>
+ */
 public class ArtAddressPacket implements Packet {
 
     private static final int PORT_NAME_LENGTH = 18;

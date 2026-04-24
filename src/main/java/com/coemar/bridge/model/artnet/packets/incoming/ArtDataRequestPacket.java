@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Richiesta di dati descrittivi del dispositivo, ad esempio URL o informazioni prodotto.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> controller -&gt; nodo/media server, in unicast.</li>
+ *   <li><b>Risposta attesa:</b> {@code ArtDataReplyPacket}.</li>
+ *   <li><b>Serve per:</b> interrogare dati identificati da un request code della tabella Art-Net.</li>
+ *   <li><b>Non fa:</b> non configura il nodo e non trasporta DMX/RDM.</li>
+ * </ul>
+ */
 public class ArtDataRequestPacket implements Packet {
 
     private static final int SPARE_LENGTH = 22;

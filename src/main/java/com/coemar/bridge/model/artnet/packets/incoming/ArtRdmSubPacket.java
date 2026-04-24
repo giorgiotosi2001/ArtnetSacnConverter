@@ -4,6 +4,15 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * <p>Trasporto compatto di Get/Set e relative risposte RDM per piu sub-device dello stesso device.</p>
+ * <ul>
+ *   <li><b>Direzione tipica:</b> bidirezionale tra controller, gateway e dispositivi che proxy/emulano RDM, in unicast.</li>
+ *   <li><b>Risposta attesa:</b> dipende da {@code CommandClass}; il pacchetto puo essere sia richiesta sia risposta.</li>
+ *   <li><b>Serve per:</b> ridurre banda rispetto a piu {@code ArtRdmPacket} quando si lavora con sub-device multipli.</li>
+ *   <li><b>Note:</b> non sostituisce {@code ArtRdmPacket}; la dimensione del campo dati dipende da {@code CommandClass} e {@code SubCount}.</li>
+ * </ul>
+ */
 public class ArtRdmSubPacket implements Packet {
 
     private static final int UID_LENGTH = 6;
