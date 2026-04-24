@@ -5,15 +5,19 @@ import com.coemar.bridge.artnet.NodeReportStatusCode;
 import com.coemar.bridge.artnet.StyleCodes;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static com.coemar.bridge.util.BinarySerializeUtils.*;
 
 public class ArtPollReplyPacket {
+    private static final int IPV4_LENGTH = 4;
+    private static final int MAC_LENGTH = 6;
+    private static final int UID_LENGTH = 6;
     private static final byte[] ARTNET_ID =
             "Art-Net\u0000".getBytes(StandardCharsets.US_ASCII);
     private final ArtNetOpCode opCode= ArtNetOpCode.OpPollReply;
-    private final int[] ipAddress = new int[4];
+    private final byte[] ipAddress;
     private final int port;
     private final int versionInfo;
     private final int netSwitch;
@@ -35,19 +39,20 @@ public class ArtPollReplyPacket {
     private final SwMacro swMacro;
     private final SwRemote swRemote;
     private final StyleCodes style;
-    private final int macAddress;
-    private final int[] bindIp = new int[4];
+    private final byte[] macAddress;
+    private final byte[] bindIp;
     private final int bindIndex;
     private final ArtPollStatus2 artPollStatus2;
     private final GoodOutputB goodOutputB;
     private final ArtPollStatus3 artPollStatus3;
-    private final int defaultRespUID;
+    private final byte[] defaultRespUID;
     private final int user;
     private final int refreshRate;
     private final int backgroundQueuePolicy;
     private final int filler;
 
-    public ArtPollReplyPacket(int port, int versionInfo, int netSwitch, int subSwitch, int oem, int ubeaVersion, ArtPollStatus1 status1, int estaManCode, String portName, String longName, NodeReport nodeReport, int numPorts, PortTypes portTypes, GoodInput goodInput, GoodOutputA goodOutputA, int swIn, int swOut, int acnPriority, SwMacro swMacro, SwRemote swRemote, StyleCodes style, int macAddress, int bindIndex, ArtPollStatus2 artPollStatus2, GoodOutputB goodOutputB, ArtPollStatus3 artPollStatus3, int defaultRespUID, int user, int refreshRate, int backgroundQueuePolicy, int filler) {
+    public ArtPollReplyPacket(byte[] ipAddress, int port, int versionInfo, int netSwitch, int subSwitch, int oem, int ubeaVersion, ArtPollStatus1 status1, int estaManCode, String portName, String longName, NodeReport nodeReport, int numPorts, PortTypes portTypes, GoodInput goodInput, GoodOutputA goodOutputA, int swIn, int swOut, int acnPriority, SwMacro swMacro, SwRemote swRemote, StyleCodes style, byte[] macAddress, byte[] bindIp, int bindIndex, ArtPollStatus2 artPollStatus2, GoodOutputB goodOutputB, ArtPollStatus3 artPollStatus3, byte[] defaultRespUID, int user, int refreshRate, int backgroundQueuePolicy, int filler) {
+        this.ipAddress = copyFixedLengthBytes(ipAddress, IPV4_LENGTH, "ipAddress");
         this.port = port;
         this.versionInfo = versionInfo;
         this.netSwitch = netSwitch;
@@ -69,12 +74,13 @@ public class ArtPollReplyPacket {
         this.swMacro = swMacro;
         this.swRemote = swRemote;
         this.style = style;
-        this.macAddress = macAddress;
+        this.macAddress = copyFixedLengthBytes(macAddress, MAC_LENGTH, "macAddress");
+        this.bindIp = copyFixedLengthBytes(bindIp, IPV4_LENGTH, "bindIp");
         this.bindIndex = bindIndex;
         this.artPollStatus2 = artPollStatus2;
         this.goodOutputB = goodOutputB;
         this.artPollStatus3 = artPollStatus3;
-        this.defaultRespUID = defaultRespUID;
+        this.defaultRespUID = copyFixedLengthBytes(defaultRespUID, UID_LENGTH, "defaultRespUID");
         this.user = user;
         this.refreshRate = refreshRate;
         this.backgroundQueuePolicy = backgroundQueuePolicy;
@@ -88,7 +94,7 @@ public class ArtPollReplyPacket {
 
         offset = writeBytes(packet, offset, ARTNET_ID);
         offset = writeU16LE(packet, offset, opCode.getValue());
-        offset = writeIntArray(packet, offset, ipAddress, 4);
+        offset = writeBytes(packet, offset, ipAddress);
         offset = writeU16LE(packet, offset, port);
         offset = writeU16BE(packet, offset, versionInfo);
         offset = writeU8(packet, offset, netSwitch);
@@ -114,13 +120,13 @@ public class ArtPollReplyPacket {
         offset = writeU8(packet, offset, encodeSwRemote());
         offset = writeZeroBytes(packet, offset, 3);
         offset = writeU8(packet, offset, style == null ? 0 : style.getValue());
-        offset = writePackedUnsignedInt(packet, offset, macAddress, 6);
-        offset = writeIntArray(packet, offset, bindIp, 4);
+        offset = writeBytes(packet, offset, macAddress);
+        offset = writeBytes(packet, offset, bindIp);
         offset = writeU8(packet, offset, bindIndex);
         offset = writeU8(packet, offset, encodeStatus2());
         offset = writeBytes(packet, offset, encodeGoodOutputB());
         offset = writeU8(packet, offset, encodeStatus3());
-        offset = writePackedUnsignedInt(packet, offset, defaultRespUID, 6);
+        offset = writeBytes(packet, offset, defaultRespUID);
         offset = writeU16BE(packet, offset, user);
         offset = writeU16BE(packet, offset, refreshRate);
         offset = writeU8(packet, offset, backgroundQueuePolicy);
@@ -131,6 +137,16 @@ public class ArtPollReplyPacket {
         }
 
         return packet;
+    }
+
+    private static byte[] copyFixedLengthBytes(byte[] value, int expectedLength, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException(fieldName + " non puo essere null");
+        }
+        if (value.length != expectedLength) {
+            throw new IllegalArgumentException(fieldName + " deve essere lungo " + expectedLength + " byte");
+        }
+        return Arrays.copyOf(value, value.length);
     }
 
     private byte[] encodePortTypes() {
