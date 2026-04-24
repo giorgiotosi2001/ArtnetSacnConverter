@@ -3,9 +3,12 @@ package com.coemar.bridge.artnet;
 import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtAddressPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtCommandPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDataRequestPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtDiagDataPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtTimeCodePacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtPollPacket;
 
@@ -39,10 +42,16 @@ public class ArtNetParser {
                 return parseArtPollPacket(data, length);
             case OpAddress:
                 return parseArtAddressPacket(data, length);
+            case OpCommand:
+                return parseArtCommandPacket(data, length);
             case OpDataRequest:
                 return parseArtDataRequestPacket(data, length);
+            case OpDiagData:
+                return parseArtDiagDataPacket(data, length);
             case OpIpProg:
                 return parseArtIpProgPacket(data, length);
+            case OpTimeCode:
+                return parseArtTimeCodePacket(data, length);
             default:
                 break;
         }
@@ -94,6 +103,28 @@ public class ArtNetParser {
         );
     }
 
+    private static ArtCommandPacket parseArtCommandPacket(byte[] data, int length) {
+        require(length >= 18, "Pacchetto ArtCommand troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int estaManufacturerCode = u16be(data, 12);
+        int textLength = u16be(data, 14);
+
+        require(textLength >= 0 && textLength <= 512, "Text length ArtCommand fuori range");
+        require(length >= 16 + textLength, "Payload ArtCommand incompleto");
+
+        byte[] commandData = Arrays.copyOfRange(data, 16, 16 + textLength);
+
+        return new ArtCommandPacket(
+                opCode,
+                protocolVersion,
+                estaManufacturerCode,
+                textLength,
+                commandData
+        );
+    }
+
     private static ArtDataRequestPacket parseArtDataRequestPacket(byte[] data, int length) {
         require(length >= 40, "Pacchetto ArtDataRequest troppo corto");
 
@@ -111,6 +142,60 @@ public class ArtNetParser {
                 oemCode,
                 requestCode,
                 spare
+        );
+    }
+
+    private static ArtDiagDataPacket parseArtDiagDataPacket(byte[] data, int length) {
+        require(length >= 18, "Pacchetto ArtDiagData troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int diagPriority = u8(data, 13);
+        int logicalPort = u8(data, 14);
+        int filler3 = u8(data, 15);
+        int textLength = u16be(data, 16);
+
+        require(textLength >= 0 && textLength <= 512, "Text length ArtDiagData fuori range");
+        require(length >= 18 + textLength, "Payload ArtDiagData incompleto");
+
+        byte[] diagData = Arrays.copyOfRange(data, 18, 18 + textLength);
+
+        return new ArtDiagDataPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                diagPriority,
+                logicalPort,
+                filler3,
+                textLength,
+                diagData
+        );
+    }
+
+    private static ArtTimeCodePacket parseArtTimeCodePacket(byte[] data, int length) {
+        require(length >= 19, "Pacchetto ArtTimeCode troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int streamId = u8(data, 13);
+        int frames = u8(data, 14);
+        int seconds = u8(data, 15);
+        int minutes = u8(data, 16);
+        int hours = u8(data, 17);
+        int type = u8(data, 18);
+
+        return new ArtTimeCodePacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                streamId,
+                frames,
+                seconds,
+                minutes,
+                hours,
+                type
         );
     }
 
