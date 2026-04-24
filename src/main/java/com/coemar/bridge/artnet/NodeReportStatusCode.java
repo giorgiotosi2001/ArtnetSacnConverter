@@ -1,6 +1,6 @@
 package com.coemar.bridge.artnet;
 
-public enum NodeReport {
+public enum NodeReportStatusCode {
 
     RcDebug(0x0000),
     RcPowerOk(0x0001),
@@ -22,7 +22,7 @@ public enum NodeReport {
 
     private final int value;
 
-    NodeReport(int value) {
+    NodeReportStatusCode(int value) {
         this.value = value;
     }
 
@@ -30,8 +30,8 @@ public enum NodeReport {
         return value;
     }
 
-    public static NodeReport fromValue(int value) {
-        for (NodeReport report : values()) {
+    public static NodeReportStatusCode fromValue(int value) {
+        for (NodeReportStatusCode report : values()) {
             if (report.value == value) {
                 return report;
             }
