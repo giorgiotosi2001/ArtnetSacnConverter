@@ -1,4 +1,4 @@
-package com.coemar.bridge.artnet.codes;
+package com.coemar.bridge.artnet;
 
 public enum ArtNetOpCode {
 

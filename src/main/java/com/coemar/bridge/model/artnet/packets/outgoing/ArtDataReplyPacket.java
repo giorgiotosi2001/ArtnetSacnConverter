@@ -1,6 +1,6 @@
 package com.coemar.bridge.model.artnet.packets.outgoing;
 
-import com.coemar.bridge.artnet.codes.ArtNetOpCode;
+import com.coemar.bridge.artnet.ArtNetOpCode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

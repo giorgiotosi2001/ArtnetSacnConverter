@@ -1,6 +1,5 @@
 package com.coemar.bridge.artnet;
 
-import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtAddressPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtCommandPacket;

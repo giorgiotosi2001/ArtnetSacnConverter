@@ -1,8 +1,6 @@
 package com.coemar.bridge.model.artnet.packets.outgoing;
 
-import com.coemar.bridge.artnet.codes.ArtNetOpCode;
-import com.coemar.bridge.artnet.codes.NodeReportStatusCode;
-import com.coemar.bridge.artnet.codes.StyleCodes;
+import com.coemar.bridge.artnet.ArtNetOpCode;
 import com.coemar.bridge.model.artnet.fields.*;
 
 import java.nio.charset.StandardCharsets;
@@ -348,11 +346,40 @@ public class ArtPollReplyPacket {
             return "";
         }
 
-        NodeReportStatusCode statusCode = report.getStatusCode();
+        NodeReport.NodeReportStatusCode statusCode = report.getStatusCode();
         int code = statusCode == null ? 0 : statusCode.getValue();
         int counter = Math.floorMod(report.getCounter(), 10_000);
         String message = report.getMessage() == null ? "" : report.getMessage();
 
         return String.format(Locale.ROOT, "#%04X [%04d] %s", code, counter, message);
+    }
+
+    public enum StyleCodes {
+        StNode(0x00),
+        StController(0x01),
+        StMedia(0x02),
+        StRoute(0x03),
+        StBackup(0x04),
+        StConfig(0x05),
+        StVisual(0x06);
+
+        private final int value;
+
+        StyleCodes(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static StyleCodes fromValue(int value) {
+            for (StyleCodes style : values()) {
+                if (style.value == value) {
+                    return style;
+                }
+            }
+            return null;
+        }
     }
 }
