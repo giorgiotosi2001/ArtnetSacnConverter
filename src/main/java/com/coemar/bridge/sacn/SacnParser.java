@@ -4,12 +4,12 @@ import com.coemar.bridge.model.*;
 import com.coemar.bridge.model.sacn.SacnDataPacket;
 import com.coemar.bridge.model.sacn.SacnDiscoveryPacket;
 import com.coemar.bridge.model.sacn.SacnSyncPacket;
-import com.coemar.bridge.parser.PacketParser;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class SacnParser extends PacketParser {
+import static com.coemar.bridge.util.BinaryParseUtils.*;
+
+public class SacnParser {
 
     private static final byte[] ACN_PID = new byte[]{
             0x41, 0x53, 0x43, 0x2d, 0x45, 0x31, 0x2e, 0x31, 0x37, 0x00, 0x00, 0x00
@@ -149,13 +149,6 @@ public static SacnDataPacket parseDataPacket(byte[] data, int length) {
     byte[] dmxData = Arrays.copyOfRange(data, valuesOffset + 1, valuesOffset + propertyValueCount);
 
     return new SacnDataPacket(rootFlagsAndLength, framingFlagsAndLength, dmpFlagsAndLength, rootPduLength, framingPduLength, dmpPduLength, preambleSize, postambleSize, cid, rootVector, framingVector, sourceName, priority, synchronizationAddress, sequenceNumber, options, universe, dmpVector, addressTypeAndDataType, firstPropertyAddress, addressIncrement, propertyValueCount, startCode, dmxData);
-}
-
-static String readNullTerminatedUtf8(byte[] data, int offset, int maxLen) {
-    int end = offset;
-    int limit = offset + maxLen;
-    while (end < limit && data[end] != 0) end++;
-    return new String(data, offset, end - offset, StandardCharsets.UTF_8);
 }
 
 public static boolean looksLikeSacn(byte[] data, int length) {

@@ -48,4 +48,34 @@ public final class ArtPollStatus1 {
         // bit 0
         this.ubeaPresent = (value & 1) == 1;
     }
+
+    public byte toByte() {
+        int value = 0;
+
+        value |= switch (indicatorState) {
+            case LOCATE_IDENTIFY -> 0b01 << 6;
+            case MUTE -> 0b10 << 6;
+            case NORMAL -> 0b11 << 6;
+            case UNKNOWN -> 0;
+        };
+
+        value |= switch (portAddressAuthority) {
+            case FRONT_PANEL -> 0b01 << 4;
+            case NETWORK -> 0b10 << 4;
+            case UNUSED -> 0b11 << 4;
+            case UNKNOWN -> 0;
+        };
+
+        if (bootedFromRom) {
+            value |= 1 << 2;
+        }
+        if (rdmCapable) {
+            value |= 1 << 1;
+        }
+        if (ubeaPresent) {
+            value |= 1;
+        }
+
+        return (byte) value;
+    }
 }

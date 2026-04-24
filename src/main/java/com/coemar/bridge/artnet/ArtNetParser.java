@@ -2,18 +2,17 @@ package com.coemar.bridge.artnet;
 
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.ArtDmxPacket;
-import com.coemar.bridge.model.LightingPacket;
 import com.coemar.bridge.model.artnet.ArtPollFlags;
 import com.coemar.bridge.model.artnet.ArtPollPacket;
-import com.coemar.bridge.parser.PacketParser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
 import static com.coemar.bridge.artnet.ArtNetOpCode.*;
+import static com.coemar.bridge.util.BinaryParseUtils.*;
 
-public class ArtNetParser extends PacketParser {
+public class ArtNetParser {
 
     private static final byte[] ARTNET_ID =
             "Art-Net\u0000".getBytes(StandardCharsets.US_ASCII);
