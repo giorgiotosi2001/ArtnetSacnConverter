@@ -7,11 +7,16 @@ import com.coemar.bridge.model.artnet.packets.incoming.ArtCommandPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDataRequestPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDiagDataPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtFirmwareMasterPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtInputPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtNzsPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtRdmPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtRdmSubPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtSyncPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtTimeCodePacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtTodControlPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtTodRequestPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtTriggerPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtVlcPacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
@@ -47,6 +52,10 @@ public class ArtNetParser {
                 return parseArtNzs(data, length);
             case OpPoll:
                 return parseArtPollPacket(data, length);
+            case OpRdm:
+                return parseArtRdmPacket(data, length);
+            case OpRdmSub:
+                return parseArtRdmSubPacket(data, length);
             case OpAddress:
                 return parseArtAddressPacket(data, length);
             case OpCommand:
@@ -55,6 +64,8 @@ public class ArtNetParser {
                 return parseArtDataRequestPacket(data, length);
             case OpDiagData:
                 return parseArtDiagDataPacket(data, length);
+            case OpFirmwareMaster:
+                return parseArtFirmwareMasterPacket(data, length);
             case OpInput:
                 return parseArtInputPacket(data, length);
             case OpIpProg:
@@ -63,6 +74,10 @@ public class ArtNetParser {
                 return parseArtSyncPacket(data, length);
             case OpTimeCode:
                 return parseArtTimeCodePacket(data, length);
+            case OpTodControl:
+                return parseArtTodControlPacket(data, length);
+            case OpTodRequest:
+                return parseArtTodRequestPacket(data, length);
             case OpTrigger:
                 return parseArtTriggerPacket(data, length);
             default:
@@ -113,6 +128,87 @@ public class ArtNetParser {
                 subSwitch,
                 acnPriority,
                 command
+        );
+    }
+
+    private static ArtRdmPacket parseArtRdmPacket(byte[] data, int length) {
+        require(length >= 24, "Pacchetto ArtRdm troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int rdmVersion = u8(data, 12);
+        int filler2 = u8(data, 13);
+        byte[] spare = Arrays.copyOfRange(data, 14, 19);
+        int fifoAvail = u8(data, 19);
+        int fifoMax = u8(data, 20);
+        int net = u8(data, 21);
+        int command = u8(data, 22);
+        int address = u8(data, 23);
+        byte[] rdmPacket = Arrays.copyOfRange(data, 24, length);
+
+        return new ArtRdmPacket(
+                opCode,
+                protocolVersion,
+                rdmVersion,
+                filler2,
+                spare,
+                fifoAvail,
+                fifoMax,
+                net,
+                command,
+                address,
+                rdmPacket
+        );
+    }
+
+    private static ArtRdmSubPacket parseArtRdmSubPacket(byte[] data, int length) {
+        require(length >= 32, "Pacchetto ArtRdmSub troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int rdmVersion = u8(data, 12);
+        int filler2 = u8(data, 13);
+        byte[] uid = Arrays.copyOfRange(data, 14, 20);
+        int spare1 = u8(data, 20);
+        int commandClass = u8(data, 21);
+        int parameterId = u16be(data, 22);
+        int subDevice = u16be(data, 24);
+        int subCount = u16be(data, 26);
+        byte[] spareTail = Arrays.copyOfRange(data, 28, 32);
+        byte[] dataBytes = Arrays.copyOfRange(data, 32, length);
+
+        require(subCount > 0, "SubCount ArtRdmSub deve essere maggiore di zero");
+        require((dataBytes.length & 1) == 0, "Payload ArtRdmSub deve avere lunghezza pari");
+
+        ArtRdmSubPacket.CommandClass commandClassType = ArtRdmSubPacket.CommandClass.fromValue(commandClass);
+        int expectedWordCount = switch (commandClassType) {
+            case Get, SetResponse -> 0;
+            case Set, GetResponse -> subCount;
+            case Unknown -> dataBytes.length / 2;
+        };
+
+        if (commandClassType != ArtRdmSubPacket.CommandClass.Unknown) {
+            require(dataBytes.length == expectedWordCount * 2, "Payload ArtRdmSub non coerente con CommandClass e SubCount");
+        }
+
+        int[] dataWords = new int[dataBytes.length / 2];
+        for (int i = 0; i < dataWords.length; i++) {
+            dataWords[i] = u16be(dataBytes, i * 2);
+        }
+
+        return new ArtRdmSubPacket(
+                opCode,
+                protocolVersion,
+                rdmVersion,
+                filler2,
+                uid,
+                spare1,
+                commandClass,
+                parameterId,
+                subDevice,
+                subCount,
+                spareTail,
+                dataWords
         );
     }
 
@@ -208,6 +304,32 @@ public class ArtNetParser {
         );
     }
 
+    private static ArtFirmwareMasterPacket parseArtFirmwareMasterPacket(byte[] data, int length) {
+        require(length >= 552, "Pacchetto ArtFirmwareMaster troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int filler2 = u8(data, 13);
+        int type = u8(data, 14);
+        int blockId = u8(data, 15);
+        long firmwareLength = u32be(data, 16) & 0xFFFF_FFFFL;
+        byte[] spare = Arrays.copyOfRange(data, 20, 40);
+        byte[] firmwareData = Arrays.copyOfRange(data, 40, 552);
+
+        return new ArtFirmwareMasterPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                filler2,
+                type,
+                blockId,
+                firmwareLength,
+                spare,
+                firmwareData
+        );
+    }
+
     private static ArtTimeCodePacket parseArtTimeCodePacket(byte[] data, int length) {
         require(length >= 19, "Pacchetto ArtTimeCode troppo corto");
 
@@ -231,6 +353,58 @@ public class ArtNetParser {
                 minutes,
                 hours,
                 type
+        );
+    }
+
+    private static ArtTodRequestPacket parseArtTodRequestPacket(byte[] data, int length) {
+        require(length >= 56, "Pacchetto ArtTodRequest troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int filler2 = u8(data, 13);
+        byte[] spare = Arrays.copyOfRange(data, 14, 21);
+        int net = u8(data, 21);
+        int command = u8(data, 22);
+        int addCount = u8(data, 23);
+        byte[] address = Arrays.copyOfRange(data, 24, 56);
+
+        require(addCount >= 0 && addCount <= 32, "AddCount ArtTodRequest fuori range");
+
+        return new ArtTodRequestPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                filler2,
+                spare,
+                net,
+                command,
+                addCount,
+                address
+        );
+    }
+
+    private static ArtTodControlPacket parseArtTodControlPacket(byte[] data, int length) {
+        require(length >= 24, "Pacchetto ArtTodControl troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int filler1 = u8(data, 12);
+        int filler2 = u8(data, 13);
+        byte[] spare = Arrays.copyOfRange(data, 14, 21);
+        int net = u8(data, 21);
+        int command = u8(data, 22);
+        int address = u8(data, 23);
+
+        return new ArtTodControlPacket(
+                opCode,
+                protocolVersion,
+                filler1,
+                filler2,
+                spare,
+                net,
+                command,
+                address
         );
     }
 
