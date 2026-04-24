@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * <p>Pacchetto di comando testuale application-specific per proprieta o funzioni vendor-specific.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller/nodo/media server -&gt; destinatario Art-Net, in unicast o broadcast.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata a livello Art-Net.</li>
- *   <li><b>Serve per:</b> inviare una o piu stringhe comando nel formato {@code Command=Data&...}.</li>
- *   <li><b>Note:</b> il testo e ASCII, case-insensitive e orientato a funzioni applicative, non a DMX.</li>
- * </ul>
+ * Pacchetto di comando testuale application-specific per proprieta o funzioni vendor-specific.
+ *
+ * - Direzione tipica: controller/nodo/media server -> destinatario Art-Net, in unicast o broadcast.
+ * - Risposta attesa: nessuna risposta dedicata a livello Art-Net.
+ * - Serve per: inviare una o piu stringhe comando nel formato {@code Command=Data&...}.
+ * - Note: il testo e ASCII, case-insensitive e orientato a funzioni applicative, non a DMX.
  */
 public class ArtCommandPacket implements Packet {
 

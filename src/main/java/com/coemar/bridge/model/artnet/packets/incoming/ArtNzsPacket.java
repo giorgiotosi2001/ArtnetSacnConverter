@@ -5,13 +5,12 @@ import com.coemar.bridge.model.LightingPacket;
 import java.util.Arrays;
 
 /**
- * <p>Pacchetto dati DMX con start code non zero, escluso RDM.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller/nodo -&gt; nodo/controller, solo in unicast.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
- *   <li><b>Serve per:</b> trasportare alternate start code mantenendo lo stesso modello di routing di {@code ArtDmxPacket}.</li>
- *   <li><b>Non fa:</b> non accetta start code {@code 0x00} e non trasporta RDM.</li>
- * </ul>
+ * Pacchetto dati DMX con start code non zero, escluso RDM.
+ *
+ * - Direzione tipica: controller/nodo -> nodo/controller, solo in unicast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: trasportare alternate start code mantenendo lo stesso modello di routing di {@code ArtDmxPacket}.
+ * - Non fa: non accetta start code {@code 0x00} e non trasporta RDM.
  */
 public class ArtNzsPacket implements LightingPacket {
 

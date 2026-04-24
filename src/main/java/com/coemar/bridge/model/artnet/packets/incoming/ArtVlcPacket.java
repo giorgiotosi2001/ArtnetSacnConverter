@@ -4,13 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * <p>Implementazione specifica di {@code ArtNzsPacket} per il trasporto di dati VLC.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller/nodo -&gt; nodo/controller, in unicast.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
- *   <li><b>Serve per:</b> inviare payload VLC con metadati di transazione, slot, frequenza e linguaggio payload.</li>
- *   <li><b>Note:</b> e riconoscibile da start code {@code 0x09} e magic bytes {@code 41 4C 45}.</li>
- * </ul>
+ * Implementazione specifica di {@code ArtNzsPacket} per il trasporto di dati VLC.
+ *
+ * - Direzione tipica: controller/nodo -> nodo/controller, in unicast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: inviare payload VLC con metadati di transazione, slot, frequenza e linguaggio payload.
+ * - Note: e riconoscibile da start code {@code 0x09} e magic bytes {@code 41 4C 45}.
  */
 public class ArtVlcPacket extends ArtNzsPacket {
 

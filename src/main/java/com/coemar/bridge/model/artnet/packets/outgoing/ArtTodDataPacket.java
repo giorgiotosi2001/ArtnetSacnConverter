@@ -12,13 +12,12 @@ import static com.coemar.bridge.util.BinarySerializeUtils.writeU8;
 import static com.coemar.bridge.util.BinarySerializeUtils.writeZeroBytes;
 
 /**
- * <p>Risposta con la Table of Devices (TOD), cioe la lista UID RDM di un universo/porta.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> output/input gateway -&gt; richiedente, in unicast.</li>
- *   <li><b>Risponde a:</b> {@code ArtTodRequestPacket} o {@code ArtTodControlPacket}.</li>
- *   <li><b>Serve per:</b> restituire il TOD completo o un blocco del TOD quando gli UID sono molti.</li>
- *   <li><b>Note:</b> puo segnalare {@code TodNak} se il TOD non e disponibile o la discovery e incompleta.</li>
- * </ul>
+ * Risposta con la Table of Devices (TOD), cioe la lista UID RDM di un universo/porta.
+ *
+ * - Direzione tipica: output/input gateway -> richiedente, in unicast.
+ * - Risponde a: {@code ArtTodRequestPacket} o {@code ArtTodControlPacket}.
+ * - Serve per: restituire il TOD completo o un blocco del TOD quando gli UID sono molti.
+ * - Note: puo segnalare {@code TodNak} se il TOD non e disponibile o la discovery e incompleta.
  */
 public class ArtTodDataPacket {
 

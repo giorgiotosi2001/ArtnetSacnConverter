@@ -3,13 +3,12 @@ package com.coemar.bridge.model.artnet.packets.incoming;
 import com.coemar.bridge.model.Packet;
 
 /**
- * <p>Trigger di sincronizzazione per emettere insieme ArtDmx gia ricevuti.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller -&gt; nodi, in directed broadcast.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
- *   <li><b>Serve per:</b> forzare l'output sincrono di piu universi in applicazioni video o media-wall.</li>
- *   <li><b>Note:</b> mette il nodo in modalita sincrona; senza nuovi sync il nodo torna poi in modalita non sincrona.</li>
- * </ul>
+ * Trigger di sincronizzazione per emettere insieme ArtDmx gia ricevuti.
+ *
+ * - Direzione tipica: controller -> nodi, in directed broadcast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: forzare l'output sincrono di piu universi in applicazioni video o media-wall.
+ * - Note: mette il nodo in modalita sincrona; senza nuovi sync il nodo torna poi in modalita non sincrona.
  */
 public class ArtSyncPacket implements Packet {
 

@@ -6,13 +6,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * <p>Messaggio di diagnostica testuale destinato a tool o controller Art-Net.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> nodo/controller/media server -&gt; destinazione definita dalla strategia di {@code ArtPollPacket}.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
- *   <li><b>Serve per:</b> inviare testo diagnostico con priorita e porta logica associata.</li>
- *   <li><b>Non fa:</b> non trasporta livelli DMX e non cambia configurazioni del nodo.</li>
- * </ul>
+ * Messaggio di diagnostica testuale destinato a tool o controller Art-Net.
+ *
+ * - Direzione tipica: nodo/controller/media server -> destinazione definita dalla strategia di {@code ArtPollPacket}.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: inviare testo diagnostico con priorita e porta logica associata.
+ * - Non fa: non trasporta livelli DMX e non cambia configurazioni del nodo.
  */
 public class ArtDiagDataPacket implements Packet {
 

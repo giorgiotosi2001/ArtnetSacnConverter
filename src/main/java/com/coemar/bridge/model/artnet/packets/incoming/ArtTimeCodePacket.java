@@ -3,13 +3,12 @@ package com.coemar.bridge.model.artnet.packets.incoming;
 import com.coemar.bridge.model.Packet;
 
 /**
- * <p>Trasporto di time code su Art-Net, compatibile con formati film, EBU, DF e SMPTE.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> application-specific; spesso controller -&gt; rete in broadcast.</li>
- *   <li><b>Risposta attesa:</b> nessuna risposta dedicata.</li>
- *   <li><b>Serve per:</b> distribuire time code di sincronizzazione su rete Art-Net.</li>
- *   <li><b>Non fa:</b> non controlla output DMX e non e un pacchetto di configurazione.</li>
- * </ul>
+ * Trasporto di time code su Art-Net, compatibile con formati film, EBU, DF e SMPTE.
+ *
+ * - Direzione tipica: application-specific; spesso controller -> rete in broadcast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: distribuire time code di sincronizzazione su rete Art-Net.
+ * - Non fa: non controlla output DMX e non e un pacchetto di configurazione.
  */
 public class ArtTimeCodePacket implements Packet {
 

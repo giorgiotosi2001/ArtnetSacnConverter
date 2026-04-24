@@ -12,13 +12,12 @@ import static com.coemar.bridge.util.BinarySerializeUtils.writeU8;
 import static com.coemar.bridge.util.BinarySerializeUtils.writeZeroBytes;
 
 /**
- * <p>Risposta di acknowledge a un blocco {@code ArtFirmwareMasterPacket}.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> nodo -&gt; controller, in unicast.</li>
- *   <li><b>Risponde a:</b> {@code ArtFirmwareMasterPacket}.</li>
- *   <li><b>Serve per:</b> segnalare blocco ricevuto, upload completato o errore di firmware/UBEA.</li>
- *   <li><b>Note:</b> dopo un esito positivo il controller puo inviare il blocco successivo.</li>
- * </ul>
+ * Risposta di acknowledge a un blocco {@code ArtFirmwareMasterPacket}.
+ *
+ * - Direzione tipica: nodo -> controller, in unicast.
+ * - Risponde a: {@code ArtFirmwareMasterPacket}.
+ * - Serve per: segnalare blocco ricevuto, upload completato o errore di firmware/UBEA.
+ * - Note: dopo un esito positivo il controller puo inviare il blocco successivo.
  */
 public class ArtFirmwareReplyPacket {
 

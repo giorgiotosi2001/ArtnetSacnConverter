@@ -5,13 +5,12 @@ import com.coemar.bridge.model.LightingPacket;
 import java.util.Arrays;
 
 /**
- * <p>Pacchetto dati DMX512 standard per il trasferimento dei livelli di un universo.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller/nodo -&gt; nodo/controller, solo in unicast verso i subscriber dell'universo.</li>
- *   <li><b>Risposta attesa:</b> nessuna; il dato viene usato direttamente in output o bufferizzato per {@code ArtSyncPacket}.</li>
- *   <li><b>Serve per:</b> trasportare frame DMX512 con sequence, physical port e Port-Address.</li>
- *   <li><b>Non fa:</b> non e consentito in broadcast e non e un pacchetto di configurazione.</li>
- * </ul>
+ * Pacchetto dati DMX512 standard per il trasferimento dei livelli di un universo.
+ *
+ * - Direzione tipica: controller/nodo -> nodo/controller, solo in unicast verso i subscriber dell'universo.
+ * - Risposta attesa: nessuna; il dato viene usato direttamente in output o bufferizzato per {@code ArtSyncPacket}.
+ * - Serve per: trasportare frame DMX512 con sequence, physical port e Port-Address.
+ * - Non fa: non e consentito in broadcast e non e un pacchetto di configurazione.
  */
 public class ArtDmxPacket implements LightingPacket {
 

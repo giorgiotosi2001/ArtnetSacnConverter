@@ -8,13 +8,12 @@ import java.util.Arrays;
 import static com.coemar.bridge.util.BinarySerializeUtils.*;
 
 /**
- * <p>Risposta allo stato di programmazione IP remota del nodo.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> nodo -&gt; controller che ha inviato la richiesta, in unicast.</li>
- *   <li><b>Risponde a:</b> {@code ArtIpProgPacket}.</li>
- *   <li><b>Serve per:</b> restituire IP, mask, gateway, porta e stato DHCP correnti/programmatici.</li>
- *   <li><b>Note:</b> e un packet di esito/stato; non trasporta DMX.</li>
- * </ul>
+ * Risposta allo stato di programmazione IP remota del nodo.
+ *
+ * - Direzione tipica: nodo -> controller che ha inviato la richiesta, in unicast.
+ * - Risponde a: {@code ArtIpProgPacket}.
+ * - Serve per: restituire IP, mask, gateway, porta e stato DHCP correnti/programmatici.
+ * - Note: e un packet di esito/stato; non trasporta DMX.
  */
 public class ArtIpProgReplyPacket {
 

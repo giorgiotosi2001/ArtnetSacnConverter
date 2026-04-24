@@ -8,13 +8,12 @@ import java.util.Arrays;
 import static com.coemar.bridge.util.BinarySerializeUtils.*;
 
 /**
- * <p>Risposta a una {@code ArtDataRequestPacket} con dati descrittivi del dispositivo.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> nodo/media server -&gt; controller che ha fatto la richiesta, in unicast.</li>
- *   <li><b>Risponde a:</b> {@code ArtDataRequestPacket}.</li>
- *   <li><b>Serve per:</b> restituire payload come URL, documentazione o dati vendor-specific.</li>
- *   <li><b>Note:</b> il payload puo essere binario o stringa ASCII null-terminated, a seconda del request code.</li>
- * </ul>
+ * Risposta a una {@code ArtDataRequestPacket} con dati descrittivi del dispositivo.
+ *
+ * - Direzione tipica: nodo/media server -> controller che ha fatto la richiesta, in unicast.
+ * - Risponde a: {@code ArtDataRequestPacket}.
+ * - Serve per: restituire payload come URL, documentazione o dati vendor-specific.
+ * - Note: il payload puo essere binario o stringa ASCII null-terminated, a seconda del request code.
  */
 public class ArtDataReplyPacket {
 

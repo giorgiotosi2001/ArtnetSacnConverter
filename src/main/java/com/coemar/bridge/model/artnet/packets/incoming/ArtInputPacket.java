@@ -5,13 +5,12 @@ import com.coemar.bridge.model.Packet;
 import java.util.Arrays;
 
 /**
- * <p>Comando per abilitare o disabilitare gli ingressi DMX512 di un nodo.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller o device di monitoraggio -&gt; nodo, in unicast.</li>
- *   <li><b>Risposta attesa:</b> {@code ArtPollReplyPacket}.</li>
- *   <li><b>Serve per:</b> controllare il traffico di rete disattivando ingressi non utilizzati.</li>
- *   <li><b>Non fa:</b> non regola le uscite DMX e non trasporta livelli DMX.</li>
- * </ul>
+ * Comando per abilitare o disabilitare gli ingressi DMX512 di un nodo.
+ *
+ * - Direzione tipica: controller o device di monitoraggio -> nodo, in unicast.
+ * - Risposta attesa: {@code ArtPollReplyPacket}.
+ * - Serve per: controllare il traffico di rete disattivando ingressi non utilizzati.
+ * - Non fa: non regola le uscite DMX e non trasporta livelli DMX.
  */
 public class ArtInputPacket implements Packet {
 

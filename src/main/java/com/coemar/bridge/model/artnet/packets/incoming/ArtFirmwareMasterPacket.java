@@ -5,13 +5,12 @@ import com.coemar.bridge.model.Packet;
 import java.util.Arrays;
 
 /**
- * <p>Blocco di upload firmware o UBEA inviato dal controller a un nodo.</p>
- * <ul>
- *   <li><b>Direzione tipica:</b> controller -&gt; nodo, in unicast.</li>
- *   <li><b>Risposta attesa:</b> {@code ArtFirmwareReplyPacket} per ogni blocco.</li>
- *   <li><b>Serve per:</b> trasferire il blocco corrente, con tipo first/cont/last e lunghezza totale firmware.</li>
- *   <li><b>Note:</b> il payload e fisso a 512 byte; il tipo distingue firmware normale e UBEA.</li>
- * </ul>
+ * Blocco di upload firmware o UBEA inviato dal controller a un nodo.
+ *
+ * - Direzione tipica: controller -> nodo, in unicast.
+ * - Risposta attesa: {@code ArtFirmwareReplyPacket} per ogni blocco.
+ * - Serve per: trasferire il blocco corrente, con tipo first/cont/last e lunghezza totale firmware.
+ * - Note: il payload e fisso a 512 byte; il tipo distingue firmware normale e UBEA.
  */
 public class ArtFirmwareMasterPacket implements Packet {
 
