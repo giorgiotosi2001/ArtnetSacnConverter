@@ -3,6 +3,7 @@ package com.coemar.bridge.artnet;
 import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtAddressPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtDataRequestPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
@@ -38,11 +39,10 @@ public class ArtNetParser {
                 return parseArtPollPacket(data, length);
             case OpAddress:
                 return parseArtAddressPacket(data, length);
+            case OpDataRequest:
+                return parseArtDataRequestPacket(data, length);
             case OpIpProg:
                 return parseArtIpProgPacket(data, length);
-            case OpPollReply:
-            case OpDiagData:
-                break;
             default:
                 break;
         }
@@ -94,6 +94,26 @@ public class ArtNetParser {
         );
     }
 
+    private static ArtDataRequestPacket parseArtDataRequestPacket(byte[] data, int length) {
+        require(length >= 40, "Pacchetto ArtDataRequest troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int estaManufacturerCode = u16be(data, 12);
+        int oemCode = u16be(data, 14);
+        int requestCode = u16be(data, 16);
+        byte[] spare = Arrays.copyOfRange(data, 18, 40);
+
+        return new ArtDataRequestPacket(
+                opCode,
+                protocolVersion,
+                estaManufacturerCode,
+                oemCode,
+                requestCode,
+                spare
+        );
+    }
+
     public static ArtDmxPacket parseArtDmx(byte[] data, int lengthData) {
 
         int opCode = u16le(data, 8);
@@ -108,9 +128,9 @@ public class ArtNetParser {
         require(length >= 2 && length <= 512, "Length ArtDmx fuori range");
         require(lengthData >= 18 + length, "Payload ArtDmx incompleto");
 
-        byte[]dmxData = Arrays.copyOfRange(data, 18, 18 + length);
+        byte[] dmxData = Arrays.copyOfRange(data, 18, 18 + length);
 
-        return new ArtDmxPacket( opCode,  protocolVersion,  sequence,  physical,  subUni,  net,  portAddress,  length,  dmxData);
+        return new ArtDmxPacket(opCode, protocolVersion, sequence, physical, subUni, net, portAddress, length, dmxData);
     }
 
     private static ArtIpProgPacket parseArtIpProgPacket(byte[] data, int length) {
