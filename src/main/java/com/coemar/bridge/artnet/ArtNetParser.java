@@ -2,6 +2,7 @@ package com.coemar.bridge.artnet;
 
 import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtAddressPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtIpProgPacket;
 import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
@@ -35,6 +36,8 @@ public class ArtNetParser {
                 return parseArtDmx(data, length);
             case OpPoll:
                 return parseArtPollPacket(data, length);
+            case OpAddress:
+                return parseArtAddressPacket(data, length);
             case OpIpProg:
                 return parseArtIpProgPacket(data, length);
             case OpPollReply:
@@ -59,6 +62,36 @@ public class ArtNetParser {
         int oemCode = u16be(data, 20);
 
         return new ArtPollPacket(opCode, protocolVersion, flags, diagPriority, targetPortAddressTop, targetPortAddressBottom, estaManufacturerCode, oemCode);
+    }
+
+    private static ArtAddressPacket parseArtAddressPacket(byte[] data, int length) {
+        require(length >= 107, "Pacchetto ArtAddress troppo corto");
+
+        int opCode = u16le(data, 8);
+        int protocolVersion = u16be(data, 10);
+        int netSwitch = u8(data, 12);
+        int bindIndex = u8(data, 13);
+        String portName = readNullTerminatedUtf8(data, 14, 18);
+        String longName = readNullTerminatedUtf8(data, 32, 64);
+        byte[] swIn = Arrays.copyOfRange(data, 96, 100);
+        byte[] swOut = Arrays.copyOfRange(data, 100, 104);
+        int subSwitch = u8(data, 104);
+        int acnPriority = u8(data, 105);
+        int command = u8(data, 106);
+
+        return new ArtAddressPacket(
+                opCode,
+                protocolVersion,
+                netSwitch,
+                bindIndex,
+                portName,
+                longName,
+                swIn,
+                swOut,
+                subSwitch,
+                acnPriority,
+                command
+        );
     }
 
     public static ArtDmxPacket parseArtDmx(byte[] data, int lengthData) {
