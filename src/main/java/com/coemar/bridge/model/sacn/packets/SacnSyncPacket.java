@@ -4,6 +4,14 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * Pacchetto sACN di sincronizzazione universi, privo di payload DMX.
+ *
+ * - Direzione tipica: source -> receiver in multicast o unicast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: triggerare l'aggiornamento simultaneo dei {@code SacnDataPacket} associati a un synchronization address.
+ * - Note: trasporta solo informazioni di sync; l'universo di sincronizzazione puo esistere anche come normale universo dati.
+ */
 public class SacnSyncPacket implements Packet {
 
     private final int rootFlagsAndLength;

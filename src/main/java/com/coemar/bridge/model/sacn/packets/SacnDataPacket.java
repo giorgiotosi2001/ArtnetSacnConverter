@@ -4,6 +4,14 @@ import com.coemar.bridge.model.LightingPacket;
 
 import java.util.Arrays;
 
+/**
+ * Pacchetto sACN principale per il trasporto di DMX512-A su un universo.
+ *
+ * - Direzione tipica: source -> receiver in multicast o unicast.
+ * - Risposta attesa: nessuna risposta dedicata; sACN e un protocollo di streaming.
+ * - Serve per: trasportare start code, slot DMX, priorita, sequence number e universe.
+ * - Note: puo lavorare insieme a {@code SacnSyncPacket}; il payload contiene START Code + dati DMX.
+ */
 public class SacnDataPacket implements LightingPacket {
     private final int rootFlagsAndLength;
     private final int framingFlagsAndLength;

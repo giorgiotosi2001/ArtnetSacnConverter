@@ -4,6 +4,14 @@ import com.coemar.bridge.model.Packet;
 
 import java.util.Arrays;
 
+/**
+ * Pacchetto sACN di universe discovery usato per pubblicare gli universi attivi di una source.
+ *
+ * - Direzione tipica: source -> rete/receiver, tipicamente in multicast.
+ * - Risposta attesa: nessuna risposta dedicata.
+ * - Serve per: annunciare l'elenco ordinato degli universi su cui la source sta trasmettendo, inclusi eventuali universi di sincronizzazione.
+ * - Note: viene inviato periodicamente a pagine; non trasporta livelli DMX.
+ */
 public class SacnDiscoveryPacket implements Packet {
 
     private final int rootFlagsAndLength;
