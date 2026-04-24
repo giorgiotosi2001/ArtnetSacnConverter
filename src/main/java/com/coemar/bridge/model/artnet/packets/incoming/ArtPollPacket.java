@@ -1,6 +1,7 @@
-package com.coemar.bridge.model.artnet;
+package com.coemar.bridge.model.artnet.packets.incoming;
 
 import com.coemar.bridge.model.Packet;
+import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
 
 public class ArtPollPacket implements Packet{
 

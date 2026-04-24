@@ -1,15 +1,15 @@
 package com.coemar.bridge.artnet;
 
+import com.coemar.bridge.artnet.codes.ArtNetOpCode;
 import com.coemar.bridge.model.Packet;
-import com.coemar.bridge.model.artnet.ArtDmxPacket;
-import com.coemar.bridge.model.artnet.ArtPollFlags;
-import com.coemar.bridge.model.artnet.ArtPollPacket;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
+import com.coemar.bridge.model.artnet.fields.ArtPollFlags;
+import com.coemar.bridge.model.artnet.packets.incoming.ArtPollPacket;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.coemar.bridge.artnet.ArtNetOpCode.*;
 import static com.coemar.bridge.util.BinaryParseUtils.*;
 
 public class ArtNetParser {

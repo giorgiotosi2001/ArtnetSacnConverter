@@ -1,8 +1,9 @@
-package com.coemar.bridge.model.artnet;
+package com.coemar.bridge.model.artnet.packets.outgoing;
 
-import com.coemar.bridge.artnet.ArtNetOpCode;
-import com.coemar.bridge.artnet.NodeReportStatusCode;
-import com.coemar.bridge.artnet.StyleCodes;
+import com.coemar.bridge.artnet.codes.ArtNetOpCode;
+import com.coemar.bridge.artnet.codes.NodeReportStatusCode;
+import com.coemar.bridge.artnet.codes.StyleCodes;
+import com.coemar.bridge.model.artnet.fields.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

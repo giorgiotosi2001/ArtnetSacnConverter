@@ -1,4 +1,4 @@
-package com.coemar.bridge.model.artnet;
+package com.coemar.bridge.model.artnet.fields;
 
 public final class ArtPollStatus2 {
 

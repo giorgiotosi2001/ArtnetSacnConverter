@@ -1,6 +1,6 @@
-package com.coemar.bridge.model.artnet;
+package com.coemar.bridge.model.artnet.fields;
 
-import com.coemar.bridge.artnet.NodeReportStatusCode;
+import com.coemar.bridge.artnet.codes.NodeReportStatusCode;
 
 public final class NodeReport {
 

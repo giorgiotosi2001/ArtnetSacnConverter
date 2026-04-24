@@ -1,4 +1,4 @@
-package com.coemar.bridge.artnet;
+package com.coemar.bridge.artnet.codes;
 
 public enum NodeReportStatusCode {
 

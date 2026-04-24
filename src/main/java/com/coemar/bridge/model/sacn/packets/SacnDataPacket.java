@@ -1,4 +1,4 @@
-package com.coemar.bridge.model.sacn;
+package com.coemar.bridge.model.sacn.packets;
 
 import com.coemar.bridge.model.LightingPacket;
 

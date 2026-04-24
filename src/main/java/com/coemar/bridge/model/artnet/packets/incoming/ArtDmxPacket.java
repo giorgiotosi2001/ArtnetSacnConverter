@@ -1,4 +1,4 @@
-package com.coemar.bridge.model.artnet;
+package com.coemar.bridge.model.artnet.packets.incoming;
 
 import com.coemar.bridge.model.LightingPacket;
 

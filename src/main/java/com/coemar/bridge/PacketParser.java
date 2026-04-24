@@ -1,4 +1,4 @@
-package com.coemar.bridge.parser;
+package com.coemar.bridge;
 
 import com.coemar.bridge.artnet.ArtNetParser;
 import com.coemar.bridge.model.Packet;
