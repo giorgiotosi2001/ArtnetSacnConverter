@@ -19,8 +19,10 @@ import static com.coemar.bridge.util.BinarySerializeUtils.*;
  */
 public class ArtPollReplyPacket {
     private static final int IPV4_LENGTH = 4;
+    private static final int PORT_ADDRESS_ARRAY_LENGTH = 4;
     private static final int MAC_LENGTH = 6;
     private static final int UID_LENGTH = 6;
+    private static final int FILLER_LENGTH = 10;
     private static final byte[] ARTNET_ID =
             "Art-Net\u0000".getBytes(StandardCharsets.US_ASCII);
     private final ArtNetOpCode opCode= ArtNetOpCode.OpPollReply;
@@ -40,8 +42,8 @@ public class ArtPollReplyPacket {
     private final PortTypes portTypes;
     private final GoodInput goodInput;
     private final GoodOutputA goodOutputA;
-    private final int swIn;
-    private final int swOut;
+    private final byte[] swIn;
+    private final byte[] swOut;
     private final int acnPriority;
     private final SwMacro swMacro;
     private final SwRemote swRemote;
@@ -56,9 +58,9 @@ public class ArtPollReplyPacket {
     private final int user;
     private final int refreshRate;
     private final int backgroundQueuePolicy;
-    private final int filler;
+    private final byte[] filler;
 
-    public ArtPollReplyPacket(byte[] ipAddress, int port, int versionInfo, int netSwitch, int subSwitch, int oem, int ubeaVersion, ArtPollStatus1 status1, int estaManCode, String portName, String longName, NodeReport nodeReport, int numPorts, PortTypes portTypes, GoodInput goodInput, GoodOutputA goodOutputA, int swIn, int swOut, int acnPriority, SwMacro swMacro, SwRemote swRemote, StyleCodes style, byte[] macAddress, byte[] bindIp, int bindIndex, ArtPollStatus2 artPollStatus2, GoodOutputB goodOutputB, ArtPollStatus3 artPollStatus3, byte[] defaultRespUID, int user, int refreshRate, int backgroundQueuePolicy, int filler) {
+    public ArtPollReplyPacket(byte[] ipAddress, int port, int versionInfo, int netSwitch, int subSwitch, int oem, int ubeaVersion, ArtPollStatus1 status1, int estaManCode, String portName, String longName, NodeReport nodeReport, int numPorts, PortTypes portTypes, GoodInput goodInput, GoodOutputA goodOutputA, byte[] swIn, byte[] swOut, int acnPriority, SwMacro swMacro, SwRemote swRemote, StyleCodes style, byte[] macAddress, byte[] bindIp, int bindIndex, ArtPollStatus2 artPollStatus2, GoodOutputB goodOutputB, ArtPollStatus3 artPollStatus3, byte[] defaultRespUID, int user, int refreshRate, int backgroundQueuePolicy, byte[] filler) {
         this.ipAddress = copyFixedLengthBytes(ipAddress, IPV4_LENGTH, "ipAddress");
         this.port = port;
         this.versionInfo = versionInfo;
@@ -75,8 +77,8 @@ public class ArtPollReplyPacket {
         this.portTypes = portTypes;
         this.goodInput = goodInput;
         this.goodOutputA = goodOutputA;
-        this.swIn = swIn;
-        this.swOut = swOut;
+        this.swIn = copyFixedLengthBytes(swIn, PORT_ADDRESS_ARRAY_LENGTH, "swIn");
+        this.swOut = copyFixedLengthBytes(swOut, PORT_ADDRESS_ARRAY_LENGTH, "swOut");
         this.acnPriority = acnPriority;
         this.swMacro = swMacro;
         this.swRemote = swRemote;
@@ -91,7 +93,7 @@ public class ArtPollReplyPacket {
         this.user = user;
         this.refreshRate = refreshRate;
         this.backgroundQueuePolicy = backgroundQueuePolicy;
-        this.filler = filler;
+        this.filler = copyFixedLengthBytes(filler, FILLER_LENGTH, "filler");
     }
 
 
@@ -117,10 +119,8 @@ public class ArtPollReplyPacket {
         offset = writeBytes(packet, offset, encodePortTypes());
         offset = writeBytes(packet, offset, encodeGoodInput());
         offset = writeBytes(packet, offset, encodeGoodOutputA());
-
-        // The current model stores these Art-Net byte arrays as packed integers.
-        offset = writePackedUnsignedInt(packet, offset, swIn, 4);
-        offset = writePackedUnsignedInt(packet, offset, swOut, 4);
+        offset = writeBytes(packet, offset, swIn);
+        offset = writeBytes(packet, offset, swOut);
 
         offset = writeU8(packet, offset, acnPriority);
         offset = writeU8(packet, offset, encodeSwMacro());
@@ -137,7 +137,7 @@ public class ArtPollReplyPacket {
         offset = writeU16BE(packet, offset, user);
         offset = writeU16BE(packet, offset, refreshRate);
         offset = writeU8(packet, offset, backgroundQueuePolicy);
-        offset = writeZeroBytes(packet, offset, 10);
+        offset = writeBytes(packet, offset, filler);
 
         if (offset != packet.length) {
             throw new IllegalStateException("Lunghezza ArtPollReply non valida: " + offset);
