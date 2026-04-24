@@ -26,12 +26,12 @@ public class SacnDiscoveryPacket implements Packet {
     private final long rootVector;
     private final long framingVector;
     private final String sourceName;
-    private final int discoveryVector;
+    private final long discoveryVector;
     private final int page;
     private final int lastPage;
     private final int[] universes;
 
-    public SacnDiscoveryPacket(int rootFlagsAndLength, int framingFlagsAndLength, int discoveryFlagsAndLength, int rootPduLength, int framingPduLength, int discoveryPduLength, int preambleSize, int postambleSize, byte[] cid, long rootVector, long framingVector, String sourceName, int discoveryVector, int page, int lastPage, int[] universes) {
+    public SacnDiscoveryPacket(int rootFlagsAndLength, int framingFlagsAndLength, int discoveryFlagsAndLength, int rootPduLength, int framingPduLength, int discoveryPduLength, int preambleSize, int postambleSize, byte[] cid, long rootVector, long framingVector, String sourceName, long discoveryVector, int page, int lastPage, int[] universes) {
         this.rootFlagsAndLength = rootFlagsAndLength;
         this.framingFlagsAndLength = framingFlagsAndLength;
         this.discoveryFlagsAndLength = discoveryFlagsAndLength;
@@ -98,7 +98,7 @@ public class SacnDiscoveryPacket implements Packet {
         return sourceName;
     }
 
-    public int getDiscoveryVector() {
+    public long getDiscoveryVector() {
         return discoveryVector;
     }
 

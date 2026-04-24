@@ -1,5 +1,7 @@
 package com.coemar.bridge.model.artnet.fields;
 
+import java.nio.charset.StandardCharsets;
+
 public final class NodeReport {
 
     private final NodeReportStatusCode statusCode;
@@ -7,16 +9,26 @@ public final class NodeReport {
     private final String message;
 
     public NodeReport(byte[] nodeReport) {
-        String report = new String(nodeReport).trim();
+        if (nodeReport == null) {
+            throw new IllegalArgumentException("nodeReport non puo essere null");
+        }
+
+        String report = new String(nodeReport, StandardCharsets.US_ASCII).trim();
+        if (report.length() < 12 || report.charAt(0) != '#') {
+            throw new IllegalArgumentException("Formato NodeReport non valido: " + report);
+        }
 
         // Formato previsto: "#xxxx [yyyy] zzzzz..."
+        int counterStart = report.indexOf('[');
+        int counterEnd = report.indexOf(']');
+        if (counterStart < 6 || counterEnd <= counterStart) {
+            throw new IllegalArgumentException("Counter NodeReport non valido: " + report);
+        }
+
         String codeHex = report.substring(1, 5);
         int codeValue = Integer.parseInt(codeHex, 16);
 
         this.statusCode = NodeReportStatusCode.fromValue(codeValue);
-
-        int counterStart = report.indexOf('[');
-        int counterEnd = report.indexOf(']');
 
         this.counter = Integer.parseInt(
                 report.substring(counterStart + 1, counterEnd).trim()

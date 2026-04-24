@@ -19,18 +19,18 @@ public final class BinaryParseUtils {
         return (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
     }
 
-    public static int u32be(byte[] data, int off) {
-        return ((data[off] & 0xFF) << 24)
-                | ((data[off + 1] & 0xFF) << 16)
-                | ((data[off + 2] & 0xFF) << 8)
-                | (data[off + 3] & 0xFF);
+    public static long u32be(byte[] data, int off) {
+        return ((long) (data[off] & 0xFF) << 24)
+                | ((long) (data[off + 1] & 0xFF) << 16)
+                | ((long) (data[off + 2] & 0xFF) << 8)
+                | (data[off + 3] & 0xFFL);
     }
 
-    public static int u32le(byte[] data, int off) {
-        return (data[off] & 0xFF)
-                | ((data[off + 1] & 0xFF) << 8)
-                | ((data[off + 2] & 0xFF) << 16)
-                | ((data[off + 3] & 0xFF) << 24);
+    public static long u32le(byte[] data, int off) {
+        return (data[off] & 0xFFL)
+                | ((long) (data[off + 1] & 0xFF) << 8)
+                | ((long) (data[off + 2] & 0xFF) << 16)
+                | ((long) (data[off + 3] & 0xFF) << 24);
     }
 
     public static String readNullTerminatedUtf8(byte[] data, int offset, int maxLen) {

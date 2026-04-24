@@ -23,7 +23,6 @@ import com.coemar.bridge.model.artnet.packets.incoming.ArtPollPacket;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static com.coemar.bridge.util.BinaryParseUtils.*;
 
@@ -42,8 +41,9 @@ public class ArtNetParser {
         require(length >= 10, "Pacchetto Art-Net troppo corto");
 
         ArtNetOpCode opCode = ArtNetOpCode.fromValue(u16le(data, 8));
+        require(opCode != null, "OpCode Art-Net non supportato: 0x" + Integer.toHexString(u16le(data, 8)));
 
-        switch (Objects.requireNonNull(opCode)) {
+        switch (opCode) {
 
             case OpOutput:
                 return parseArtDmx(data, length);
@@ -88,6 +88,8 @@ public class ArtNetParser {
     }
 
     private static ArtPollPacket parseArtPollPacket(byte[] data, int length) {
+        require(length >= 22, "Pacchetto ArtPoll troppo corto");
+
         int opCode = u16le(data, 8);
         int protocolVersion = u16be(data, 10);
         ArtPollFlags flags = new ArtPollFlags(((byte) u8(data, 12)));
@@ -424,7 +426,7 @@ public class ArtNetParser {
     }
 
     private static ArtTriggerPacket parseArtTriggerPacket(byte[] data, int length) {
-        require(length >= 523, "Pacchetto ArtTrigger troppo corto");
+        require(length >= 530, "Pacchetto ArtTrigger troppo corto");
 
         int opCode = u16le(data, 8);
         int protocolVersion = u16be(data, 10);

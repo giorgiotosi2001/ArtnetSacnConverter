@@ -64,19 +64,19 @@ private static Packet parseDiscoveryPacket(byte[] data, int length) {
     int postambleSize = u16be(data, 2);
     int rootFlagsAndLength = u16be(data, 16);
     int rootPduLength = rootFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
-    int rootVector = u32be(data, 18);
+    long rootVector = u32be(data, 18);
     byte[] cid = Arrays.copyOfRange(data, 22, 38);
 
     int framingFlagsAndLength = u16be(data, 38);
     int framingPduLength = framingFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
 
-    int framingVector = u32be(data, 40);
+    long framingVector = u32be(data, 40);
     String sourceName = readNullTerminatedUtf8(data, 44, 64);
 
     int discoveryFlagsAndLength = u16be(data, 112);
     int discoveryPduLength = discoveryFlagsAndLength & 0x0FFF; // 12 bit meno significativi (il resto sono flags)
 
-    int discoveryVector = u32be(data, 114);
+    long discoveryVector = u32be(data, 114);
     int page = u8(data, 118);
     int lastPage = u8(data, 119);
 
