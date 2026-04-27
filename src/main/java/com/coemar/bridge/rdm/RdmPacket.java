@@ -1,6 +1,6 @@
-package rdm.custom;
+package com.coemar.bridge.rdm;
 
-public class PacchettoRDM {
+public class RdmPacket {
 
     private static final byte START_CODE = (byte) 0xCC;
     private static final byte SUB_START_CODE = (byte) 0x01;
@@ -12,7 +12,7 @@ public class PacchettoRDM {
     private final int pid;
     private final byte[] pd;
 
-    public PacchettoRDM(byte[] uidDest, byte[] uidSource, byte tn, byte cc, int pid, byte[] pd) {
+    public RdmPacket(byte[] uidDest, byte[] uidSource, byte tn, byte cc, int pid, byte[] pd) {
         if (uidDest == null) {
             throw new IllegalArgumentException("uidDest non può essere null");
         }
@@ -68,4 +68,6 @@ public class PacchettoRDM {
 
         return packet;
     }
+
+
 }

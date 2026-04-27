@@ -24,6 +24,14 @@ public final class BinarySerializeUtils {
         return offset + 2;
     }
 
+    public static int writeU32BE(byte[] target, int offset, int value) {
+        target[offset] = (byte) ((value >>> 24) & 0xFF);
+        target[offset + 1] = (byte) ((value >>> 16) & 0xFF);
+        target[offset + 2] = (byte) ((value >>> 8) & 0xFF);
+        target[offset + 3] = (byte) (value & 0xFF);
+        return offset + 4;
+    }
+
     public static int writeBytes(byte[] target, int offset, byte[] value) {
         System.arraycopy(value, 0, target, offset, value.length);
         return offset + value.length;

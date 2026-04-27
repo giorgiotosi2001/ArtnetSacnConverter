@@ -1,4 +1,4 @@
-package rdm.custom;
+package com.coemar.bridge.rdm;
 
 
 import java.util.Arrays;
@@ -78,7 +78,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
 
         System.out.println("Payload 0x801B: " + toHex(payload));
 
-        PacchettoRDM packet = new PacchettoRDM(
+        RdmPacket packet = new RdmPacket(
                 destinationUid,
                 config.getSourceUid(),
                 nextTransactionNumber(),
@@ -97,7 +97,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
     }
 
     private void sendDiscoveryUnMute() {
-        PacchettoRDM packet = new PacchettoRDM(
+        RdmPacket packet = new RdmPacket(
                 RdmConstants.BROADCAST_UID,
                 config.getSourceUid(),
                 nextTransactionNumber(),
@@ -113,7 +113,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
         System.arraycopy(RdmConstants.DISCOVERY_LOWER_UID, 0, payload, 0, 6);
         System.arraycopy(RdmConstants.DISCOVERY_UPPER_UID, 0, payload, 6, 6);
 
-        PacchettoRDM packet = new PacchettoRDM(
+        RdmPacket packet = new RdmPacket(
                 RdmConstants.BROADCAST_UID,
                 config.getSourceUid(),
                 nextTransactionNumber(),

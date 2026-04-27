@@ -1,4 +1,4 @@
-package rdm.custom;
+package com.coemar.bridge.rdm;
 
 public interface DmxOutput {
 
