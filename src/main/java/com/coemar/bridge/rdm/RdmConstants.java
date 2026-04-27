@@ -24,6 +24,7 @@ public final class RdmConstants {
     public static final int FAN_SPEED_CONTROL_PID = 0x8021;
 
     public static final int E120_DISC_UNIQUE_BRANCH = 0x0001;
+    public static final int E120_DISC_MUTE = 0x0002;
     public static final int E120_DISC_UN_MUTE = 0x0003;
 
     public static final int COEMAR_OUTPUTCH = 0x801B;

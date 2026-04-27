@@ -2,6 +2,7 @@ package com.coemar.bridge;
 
 import com.coemar.bridge.artnet.ArtNetParser;
 import com.coemar.bridge.model.Packet;
+import com.coemar.bridge.rdm.RdmParser;
 import com.coemar.bridge.sacn.SacnParser;
 
 public class PacketParser {
@@ -13,8 +14,10 @@ public class PacketParser {
         if (SacnParser.looksLikeSacn(data, length)) {
             return SacnParser.parse(data, length);
         }
+        if (RdmParser.looksLikeRdm(data, length)) {
+            return RdmParser.parse(data, length);
+        }
         throw new IllegalArgumentException("Pacchetto non riconosciuto");
     }
 }
-
 

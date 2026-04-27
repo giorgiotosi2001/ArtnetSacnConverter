@@ -1,6 +1,8 @@
 package com.coemar.bridge.rdm;
 
-public class RdmFrame {
+import com.coemar.bridge.model.Packet;
+
+public class RdmFrame implements Packet {
 
     private final int startCode;
     private final int subStartCode;

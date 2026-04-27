@@ -2,15 +2,35 @@ package com.coemar.bridge.rdm;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+import java.util.concurrent.locks.LockSupport;
+
 public class JSerialCommAdapter implements SerialPortAdapter {
 
     private final SerialPort port;
+    private final int breakDurationMicros;
+    private final int markAfterBreakMicros;
 
     public JSerialCommAdapter(String portName) {
+        this(portName, 176, 12);
+    }
+
+    public JSerialCommAdapter(String portName, RdmTimingConfig timingConfig) {
+        this(portName, timingConfig.getBreakDurationMicros(), timingConfig.getMarkAfterBreakMicros());
+    }
+
+    public JSerialCommAdapter(String portName, int breakDurationMicros, int markAfterBreakMicros) {
         if (portName == null || portName.isBlank()) {
             throw new IllegalArgumentException("Port name must not be blank");
         }
+        if (breakDurationMicros <= 0) {
+            throw new IllegalArgumentException("breakDurationMicros must be positive");
+        }
+        if (markAfterBreakMicros <= 0) {
+            throw new IllegalArgumentException("markAfterBreakMicros must be positive");
+        }
         this.port = SerialPort.getCommPort(portName);
+        this.breakDurationMicros = breakDurationMicros;
+        this.markAfterBreakMicros = markAfterBreakMicros;
     }
 
     @Override
@@ -46,18 +66,14 @@ public class JSerialCommAdapter implements SerialPortAdapter {
             throw new IllegalStateException("Serial port is not open");
         }
 
-        try {
-            port.setBreak();
-            Thread.sleep(1);
-            port.clearBreak();
+        port.setBreak();
+        LockSupport.parkNanos(breakDurationMicros * 1_000L);
+        port.clearBreak();
+        LockSupport.parkNanos(markAfterBreakMicros * 1_000L);
 
-            int written = port.writeBytes(data, data.length);
-            if (written != data.length) {
-                throw new IllegalStateException("Serial write failed. Written=" + written);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while writing serial data", e);
+        int written = port.writeBytes(data, data.length);
+        if (written != data.length) {
+            throw new IllegalStateException("Serial write failed. Written=" + written);
         }
     }
 

@@ -1,77 +1,79 @@
 
 package com.coemar.bridge.rdm;
 
+import java.util.Arrays;
+
+import static com.coemar.bridge.util.BinaryParseUtils.require;
+import static com.coemar.bridge.util.BinaryParseUtils.u16be;
+import static com.coemar.bridge.util.BinaryParseUtils.u8;
+
 public class RdmParser {
 
-    public static RdmFrame parse(byte[] data) {
+    public static boolean looksLikeRdm(byte[] data, int length) {
+        return data != null
+                && length >= 24
+                && u8(data, 0) == 0xCC
+                && u8(data, 1) == 0x01;
+    }
 
-        if (data == null || data.length < 24) {
-            throw new IllegalArgumentException("Pacchetto RDM troppo corto");
+    public static RdmFrame parse(byte[] data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Pacchetto RDM null");
         }
+        return parse(data, data.length);
+    }
+
+    public static RdmFrame parse(byte[] data, int length) {
+        require(data != null, "Pacchetto RDM null");
+        require(length >= 24, "Pacchetto RDM troppo corto");
+        require(length <= data.length, "Length RDM oltre il buffer");
 
         int offset = 0;
 
-        int startCode = data[offset++] & 0xFF;          // 0
-        int subStartCode = data[offset++] & 0xFF;       // 1
-        int messageLength = data[offset++] & 0xFF;      // 2
+        int startCode = u8(data, offset++);
+        int subStartCode = u8(data, offset++);
+        int messageLength = u8(data, offset++);
 
-        // VALIDAZIONE BASE
-        if (data.length != messageLength + 2) {
-            throw new IllegalArgumentException("Message Length non coerente");
-        }
+        require(startCode == 0xCC, "Start Code RDM non valido");
+        require(subStartCode == 0x01, "Sub Start Code RDM non valido");
+        require(length == messageLength + 2, "Message Length non coerente");
+        require(messageLength >= 22 && messageLength <= 255, "Message Length RDM fuori range");
 
-        // UID DEST (3-8)
-        byte[] uidDest = new byte[6];
-        System.arraycopy(data, offset, uidDest, 0, 6);
+        byte[] uidDest = Arrays.copyOfRange(data, offset, offset + 6);
         offset += 6;
 
-        // UID SRC (9-14)
-        byte[] uidSource = new byte[6];
-        System.arraycopy(data, offset, uidSource, 0, 6);
+        byte[] uidSource = Arrays.copyOfRange(data, offset, offset + 6);
         offset += 6;
 
-        int tn = data[offset++] & 0xFF;                 // 15
-        int portId = data[offset++] & 0xFF;             // 16
-        int messageCount = data[offset++] & 0xFF;       // 17
+        int tn = u8(data, offset++);
+        int portId = u8(data, offset++);
+        int messageCount = u8(data, offset++);
 
-        int subDevice =
-                ((data[offset++] & 0xFF) << 8) |
-                        (data[offset++] & 0xFF);                // 18-19
+        int subDevice = u16be(data, offset);
+        offset += 2;
 
-        int commandClass = data[offset++] & 0xFF;       // 20
+        int commandClass = u8(data, offset++);
 
-        int parameterId =
-                ((data[offset++] & 0xFF) << 8) |
-                        (data[offset++] & 0xFF);                // 21-22
+        int parameterId = u16be(data, offset);
+        offset += 2;
 
-        int pdl = data[offset++] & 0xFF;                // 23
+        int pdl = u8(data, offset++);
 
-        // PARAMETER DATA (24 -> ...)
-        if (offset + pdl > data.length - 2) {
-            throw new IllegalArgumentException("PDL non valido");
-        }
+        require(offset + pdl == length - 2, "PDL non coerente con Message Length");
 
-        byte[] parameterData = new byte[pdl];
-        System.arraycopy(data, offset, parameterData, 0, pdl);
+        byte[] parameterData = Arrays.copyOfRange(data, offset, offset + pdl);
         offset += pdl;
 
-        // CHECKSUM
-        int checksum =
-                ((data[offset++] & 0xFF) << 8) |
-                        (data[offset] & 0xFF);
+        int checksum = u16be(data, offset);
 
-        // VALIDAZIONE CHECKSUM
         int calc = 0;
         for (int i = 0; i < messageLength; i++) {
             calc += (data[i] & 0xFF);
             calc &= 0xFFFF;
         }
 
-        if (calc != checksum) {
-            throw new IllegalArgumentException("Checksum non valido");
-        }
+        require(calc == checksum, "Checksum non valido");
 
-        // COSTRUZIONE OGGETTO
         return new RdmFrame(
                 startCode,
                 subStartCode,

@@ -1,15 +1,22 @@
 package com.coemar.bridge.rdm;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.locks.LockSupport;
 
 public class RdmSerialDmxOutput implements DmxOutput {
 
     private final SerialPortAdapter serialPort;
     private final RdmDeviceConfig config;
+    private final RdmTimingConfig timing;
 
     private byte transactionNumber = 0;
-    private byte[] destinationUid;
+    private RdmUid destinationUid;
 
     public RdmSerialDmxOutput(SerialPortAdapter serialPort, RdmDeviceConfig config) {
         if (serialPort == null) {
@@ -20,6 +27,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
         }
         this.serialPort = serialPort;
         this.config = config;
+        this.timing = config.getTimingConfig();
     }
 
     public boolean connect() {
@@ -35,24 +43,26 @@ public class RdmSerialDmxOutput implements DmxOutput {
     }
 
     public boolean discover() {
-        ensureOpen();
-
-        sendDiscoveryUnMute();
-        sleep(50);
-
-        sendDiscoveryUniqueBranch();
-
-        byte[] response = readResponse(config.getDiscoveryTimeoutMs());
-        if (response == null || !isValidDiscoveryResponse(response)) {
+        List<RdmUid> devices = discoverDevices();
+        if (devices.isEmpty()) {
             return false;
         }
+        destinationUid = devices.get(0);
+        return true;
+    }
 
-        destinationUid = parseUidFromDiscoveryResponse(response);
-        return destinationUid != null;
+    public List<RdmUid> discoverDevices() {
+        ensureOpen();
+
+        Set<RdmUid> discovered = new LinkedHashSet<>();
+        sendDiscoveryUnMute();
+        sleep(timing.getInterDiscoveryCommandDelayMs());
+        discoverRange(RdmUid.MIN, RdmUid.MAX, discovered);
+        return new ArrayList<>(discovered);
     }
 
     public byte[] getDestinationUid() {
-        return destinationUid != null ? destinationUid.clone() : null;
+        return destinationUid != null ? destinationUid.toByteArray() : null;
     }
 
     private String toHex(byte[] bytes) {
@@ -79,7 +89,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
         System.out.println("Payload 0x801B: " + toHex(payload));
 
         RdmPacket packet = new RdmPacket(
-                destinationUid,
+                destinationUid.toByteArray(),
                 config.getSourceUid(),
                 nextTransactionNumber(),
                 RdmConstants.E120_SET_COMMAND,
@@ -88,9 +98,7 @@ public class RdmSerialDmxOutput implements DmxOutput {
         );
 
         byte[] bytes = packet.buildPacket();
-        serialPort.write(bytes);
-
-        byte[] ack = readResponse(config.getAckTimeoutMs());
+        byte[] ack = executeCommand(bytes, timing.getCommandResponseWindowMs());
         if (ack == null) {
             System.err.println("WARN: No ACK received after SET_COMMAND");
         }
@@ -108,10 +116,22 @@ public class RdmSerialDmxOutput implements DmxOutput {
         serialPort.write(packet.buildPacket());
     }
 
-    private void sendDiscoveryUniqueBranch() {
+    private void sendDiscoveryMute(RdmUid uid) {
+        RdmPacket packet = new RdmPacket(
+                uid.toByteArray(),
+                config.getSourceUid(),
+                nextTransactionNumber(),
+                RdmConstants.E120_DISCOVERY_COMMAND,
+                RdmConstants.E120_DISC_MUTE,
+                new byte[0]
+        );
+        serialPort.write(packet.buildPacket());
+    }
+
+    private void sendDiscoveryUniqueBranch(RdmUid lowerUid, RdmUid upperUid) {
         byte[] payload = new byte[12];
-        System.arraycopy(RdmConstants.DISCOVERY_LOWER_UID, 0, payload, 0, 6);
-        System.arraycopy(RdmConstants.DISCOVERY_UPPER_UID, 0, payload, 6, 6);
+        System.arraycopy(lowerUid.toByteArray(), 0, payload, 0, 6);
+        System.arraycopy(upperUid.toByteArray(), 0, payload, 6, 6);
 
         RdmPacket packet = new RdmPacket(
                 RdmConstants.BROADCAST_UID,
@@ -125,71 +145,73 @@ public class RdmSerialDmxOutput implements DmxOutput {
     }
 
     public byte[] readResponse(int timeoutMs) {
-        long deadline = System.currentTimeMillis() + timeoutMs;
-        byte[] buffer = new byte[256];
+        byte[] response = readResponseWindow(timeoutMs);
+        return response.length == 0 ? null : response;
+    }
 
-        while (System.currentTimeMillis() < deadline) {
-            if (serialPort.bytesAvailable() > 0) {
-                int read = serialPort.read(buffer, timeoutMs);
-                if (read > 0) {
-                    return Arrays.copyOf(buffer, read);
+    private void discoverRange(RdmUid lowerUid, RdmUid upperUid, Set<RdmUid> discovered) {
+        if (lowerUid.compareTo(upperUid) > 0) {
+            return;
+        }
+
+        while (true) {
+            sendDiscoveryUniqueBranch(lowerUid, upperUid);
+            byte[] response = readResponseWindow(timing.getDiscoveryResponseWindowMs());
+            if (response.length == 0) {
+                return;
+            }
+
+            Optional<RdmDiscoveryResponse> parsed = RdmDiscoveryResponse.parse(response);
+            if (parsed.isPresent()) {
+                RdmUid uid = parsed.get().getUid();
+                if (uid.compareTo(lowerUid) >= 0 && uid.compareTo(upperUid) <= 0) {
+                    discovered.add(uid);
+                    sendDiscoveryMute(uid);
+                    sleep(timing.getInterDiscoveryCommandDelayMs());
+                    continue;
                 }
             }
-            sleep(10);
-        }
 
-        return null;
+            if (lowerUid.equals(upperUid)) {
+                return;
+            }
+
+            RdmUid midpoint = RdmUid.midpoint(lowerUid, upperUid);
+            discoverRange(lowerUid, midpoint, discovered);
+            if (!midpoint.equals(upperUid)) {
+                discoverRange(midpoint.next(), upperUid, discovered);
+            }
+            return;
+        }
     }
 
-    private boolean isValidDiscoveryResponse(byte[] packet) {
-        if (packet == null || packet.length != 24) {
-            return false;
-        }
-
-        int expectedChecksum = 0;
-        for (int i = 8; i <= 19; i++) {
-            expectedChecksum += (packet[i] & 0xFF);
-        }
-        expectedChecksum &= 0xFFFF;
-
-        byte[] receivedChecksum = parseChecksumFromDiscoveryResponse(packet);
-        if (receivedChecksum == null) {
-            return false;
-        }
-
-        int actualChecksum =
-                ((receivedChecksum[0] & 0xFF) << 8) |
-                        (receivedChecksum[1] & 0xFF);
-
-        return expectedChecksum == actualChecksum;
+    private byte[] executeCommand(byte[] command, int responseWindowMs) {
+        serialPort.write(command);
+        byte[] response = readResponseWindow(responseWindowMs);
+        return response.length == 0 ? null : response;
     }
 
-    private byte[] parseUidFromDiscoveryResponse(byte[] data) {
-        if (data == null || data.length != 24) {
-            return null;
+    private byte[] readResponseWindow(int windowMs) {
+        long deadline = System.nanoTime() + (windowMs * 1_000_000L);
+        byte[] buffer = new byte[512];
+        byte[] collected = new byte[0];
+
+        while (System.nanoTime() < deadline) {
+            int available = serialPort.bytesAvailable();
+            if (available > 0) {
+                int read = serialPort.read(buffer, timing.getPerReadTimeoutMs());
+                if (read > 0) {
+                    int oldLength = collected.length;
+                    collected = Arrays.copyOf(collected, oldLength + read);
+                    System.arraycopy(buffer, 0, collected, oldLength, read);
+                }
+                continue;
+            }
+
+            LockSupport.parkNanos(timing.getReadPollIntervalMicros() * 1_000L);
         }
 
-        byte[] encodedBytes = Arrays.copyOfRange(data, 8, 20);
-        byte[] uid = new byte[6];
-
-        for (int i = 0; i < 6; i++) {
-            int byte1 = encodedBytes[i * 2] & 0x55;
-            int byte2 = encodedBytes[i * 2 + 1] & 0xAA;
-            uid[i] = (byte) (byte1 | byte2);
-        }
-
-        return uid;
-    }
-
-    private byte[] parseChecksumFromDiscoveryResponse(byte[] data) {
-        if (data == null || data.length != 24) {
-            return null;
-        }
-
-        int c1 = (data[20] & 0x55) | (data[21] & 0xAA);
-        int c2 = (data[22] & 0x55) | (data[23] & 0xAA);
-
-        return new byte[] { (byte) c1, (byte) c2 };
+        return collected;
     }
 
     private byte[] buildOutputChPayload(DmxFrame frame) {
@@ -239,6 +261,9 @@ public class RdmSerialDmxOutput implements DmxOutput {
     }
 
     private void sleep(long ms) {
+        if (ms <= 0) {
+            return;
+        }
         try {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
