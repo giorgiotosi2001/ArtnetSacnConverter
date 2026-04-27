@@ -65,6 +65,15 @@ public class RdmSerialDmxOutput implements DmxOutput {
         return new ArrayList<>(discovered);
     }
 
+    public List<RdmDiscoveredDevice> discoverDevicesWithPort() {
+        List<RdmUid> uids = discoverDevices();
+        List<RdmDiscoveredDevice> devices = new ArrayList<>(uids.size());
+        for (RdmUid uid : uids) {
+            devices.add(new RdmDiscoveredDevice(serialPort.getPortName(), uid));
+        }
+        return devices;
+    }
+
     public byte[] getDestinationUid() {
         return destinationUid != null ? destinationUid.toByteArray() : null;
     }

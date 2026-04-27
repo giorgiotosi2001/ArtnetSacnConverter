@@ -10,6 +10,7 @@ import java.util.concurrent.locks.LockSupport;
 public class JSerialCommAdapter implements SerialPortAdapter {
 
     private final SerialPort port;
+    private final String portName;
     private final int breakDurationMicros;
     private final int markAfterBreakMicros;
 
@@ -35,9 +36,15 @@ public class JSerialCommAdapter implements SerialPortAdapter {
         if (markAfterBreakMicros <= 0) {
             throw new IllegalArgumentException("markAfterBreakMicros must be positive");
         }
+        this.portName = portName;
         this.port = SerialPort.getCommPort(portName);
         this.breakDurationMicros = breakDurationMicros;
         this.markAfterBreakMicros = markAfterBreakMicros;
+    }
+
+    @Override
+    public String getPortName() {
+        return portName;
     }
 
     @Override

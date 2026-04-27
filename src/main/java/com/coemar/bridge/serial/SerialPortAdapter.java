@@ -2,6 +2,8 @@ package com.coemar.bridge.serial;
 
 public interface SerialPortAdapter {
 
+    String getPortName();
+
     boolean open();
 
     void close();

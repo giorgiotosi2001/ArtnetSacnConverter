@@ -61,6 +61,10 @@ public class RdmTimingConfig {
         return new RdmTimingConfig(discoveryTimeoutMs, ackTimeoutMs, 2, 500, 1);
     }
 
+    public static RdmTimingConfig defaults() {
+        return defaults(50, 20);
+    }
+
     public int getDiscoveryResponseWindowMs() {
         return discoveryResponseWindowMs;
     }
