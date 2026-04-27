@@ -1,4 +1,4 @@
-package com.coemar.bridge.rdm;
+package com.coemar.bridge.serial;
 
 public interface SerialPortAdapter {
 

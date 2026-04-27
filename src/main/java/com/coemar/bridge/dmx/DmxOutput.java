@@ -1,7 +1,6 @@
-package com.coemar.bridge.rdm;
+package com.coemar.bridge.dmx;
 
 public interface DmxOutput {
 
     void sendFrame(DmxFrame frame);
-
 }

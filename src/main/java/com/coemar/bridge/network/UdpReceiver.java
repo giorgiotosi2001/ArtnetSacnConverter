@@ -1,6 +1,8 @@
 package com.coemar.bridge.network;
 
 import com.coemar.bridge.artnet.ArtNetParser;
+import com.coemar.bridge.dmx.DmxFrame;
+import com.coemar.bridge.dmx.DmxFrameMapper;
 import com.coemar.bridge.model.artnet.packets.incoming.ArtDmxPacket;
 import com.coemar.bridge.model.sacn.packets.SacnDataPacket;
 import com.coemar.bridge.sacn.SacnParser;
@@ -35,6 +37,8 @@ public class UdpReceiver {
                 try {
                     SacnDataPacket sacnPacket = SacnParser.parseDataPacket(receivedData, receivedData.length);
                     System.out.println(sacnPacket);
+                    DmxFrame dmxFrame = DmxFrameMapper.fromSacn(sacnPacket);
+                    System.out.println(dmxFrame);
                 } catch (Exception e) {
                     System.out.println("Pacchetto sACN scartato: " + e.getMessage());
                 }
@@ -65,6 +69,8 @@ public class UdpReceiver {
                 try {
                     ArtDmxPacket artDmxPacket = ArtNetParser.parseArtDmx(receivedData, receivedData.length);
                     System.out.println(artDmxPacket);
+                    DmxFrame dmxFrame = DmxFrameMapper.fromArtNet(artDmxPacket);
+                    System.out.println(dmxFrame);
                 } catch (Exception e) {
                     System.out.println("Pacchetto scartato: " + e.getMessage());
                 }

@@ -1,5 +1,8 @@
-package com.coemar.bridge.rdm;
+package com.coemar.bridge.serial;
 
+import com.coemar.bridge.dmx.DmxTimingConfig;
+import com.coemar.bridge.rdm.RdmConstants;
+import com.coemar.bridge.rdm.RdmTimingConfig;
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.util.concurrent.locks.LockSupport;
@@ -15,6 +18,10 @@ public class JSerialCommAdapter implements SerialPortAdapter {
     }
 
     public JSerialCommAdapter(String portName, RdmTimingConfig timingConfig) {
+        this(portName, timingConfig.getBreakDurationMicros(), timingConfig.getMarkAfterBreakMicros());
+    }
+
+    public JSerialCommAdapter(String portName, DmxTimingConfig timingConfig) {
         this(portName, timingConfig.getBreakDurationMicros(), timingConfig.getMarkAfterBreakMicros());
     }
 

@@ -1,6 +1,10 @@
 package com.coemar.bridge.rdm;
 
 
+import com.coemar.bridge.dmx.DmxFrame;
+import com.coemar.bridge.dmx.DmxOutput;
+import com.coemar.bridge.serial.SerialPortAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
