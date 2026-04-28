@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.LockSupport;
 
 public class RdmSerialDmxOutput implements DmxOutput {
+
+    private static final int DISCOVERY_RESPONSE_RETRIES = 3;
 
     private final SerialPortAdapter serialPort;
     private final RdmDeviceConfig config;
@@ -169,14 +170,13 @@ public class RdmSerialDmxOutput implements DmxOutput {
 
         while (true) {
             sendDiscoveryUniqueBranch(lowerUid, upperUid);
-            byte[] response = readResponseWindow(timing.getDiscoveryResponseWindowMs());
-            if (response.length == 0) {
+            DiscoveryReadResult result = readDiscoveryResponse();
+            if (result.getType() == DiscoveryReadResultType.NO_RESPONSE) {
                 return;
             }
 
-            Optional<RdmDiscoveryResponse> parsed = RdmDiscoveryResponse.parse(response);
-            if (parsed.isPresent()) {
-                RdmUid uid = parsed.get().getUid();
+            if (result.getType() == DiscoveryReadResultType.VALID_RESPONSE) {
+                RdmUid uid = RdmUid.of(result.getUid());
                 if (uid.compareTo(lowerUid) >= 0 && uid.compareTo(upperUid) <= 0) {
                     discovered.add(uid);
                     sendDiscoveryMute(uid);
@@ -196,6 +196,28 @@ public class RdmSerialDmxOutput implements DmxOutput {
             }
             return;
         }
+    }
+
+    private DiscoveryReadResult readDiscoveryResponse() {
+        DiscoveryReadResult result = DiscoveryReadResult.noResponse();
+
+        for (int i = 0; i < DISCOVERY_RESPONSE_RETRIES; i++) {
+            byte[] response = readResponseWindow(timing.getDiscoveryResponseWindowMs());
+            if (response.length == 0) {
+                result = DiscoveryReadResult.noResponse();
+                continue;
+            }
+
+            result = RdmDiscoveryResponse.parse(response)
+                    .map(parsed -> DiscoveryReadResult.validResponse(parsed.getUid().toByteArray()))
+                    .orElseGet(DiscoveryReadResult::collisionOrCorrupted);
+
+            if (result.getType() != DiscoveryReadResultType.NO_RESPONSE) {
+                break;
+            }
+        }
+
+        return result;
     }
 
     private byte[] executeCommand(byte[] command, int responseWindowMs) {
